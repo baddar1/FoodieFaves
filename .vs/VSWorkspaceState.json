@@ -1,0 +1,12 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\Backend",
+    "\\Backend\\FF.Data",
+    "\\Backend\\FoodiFavs",
+    "\\Backend\\FoodiFavs\\Controllers",
+    "\\Backend\\Models"
+  ],
+  "SelectedNode": "\\Backend\\FoodiFavs\\Controllers\\UserController.cs",
+  "PreviewInSolutionExplorer": false
+}

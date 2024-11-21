@@ -18,8 +18,8 @@ namespace FF.Models
         [Required]
         public double Rating { get; set; }
         public string? Comment{ get; set; }
-        public int? Likes { get; set; }
-        public int? Points { get; set; }
+        public int? Likes { get; set; } = 0;
+        public int? Points { get; set; } = 0;
         //Navigation for the Relationship Many To one Brtween Restaurant and Reviwe
         public int RestaurantId { get; set; }
         [ForeignKey("RestaurantId")]
@@ -42,6 +42,7 @@ namespace FF.Models
         [ForeignKey("AdminId")]
         [ValidateNever]
         public Admin? AdminNav { get; set; }
+        public ICollection<Like>? LikesNav { get; set; }
 
     }
 }

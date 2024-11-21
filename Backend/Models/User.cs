@@ -56,5 +56,6 @@ namespace FF.Models
         [ForeignKey("AdminId")]
         [ValidateNever]
         public Admin? AdminNav { get; set; }
+        public ICollection<Like>? Likes { get; set; } 
     }
 }

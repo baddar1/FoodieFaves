@@ -35,10 +35,10 @@ namespace FF.Models
         public string ImgUrl { get; set; }
         public ICollection<Points> UserRestaurantPoints { get; set; }
         //Adding Relationship One To One Between User and Restaurant
-        public string? UserId { get; set; }
-        [ForeignKey("UserId")]
+        //public string? UserId { get; set; }
+        //[ForeignKey("UserId")]
         [ValidateNever]
-        public User? UserNav { get; set; }
+        public ICollection<User>? Users { get; set; }
         //Adding Relationships Many To One Between Restaurnat and Reviwe
         [ValidateNever]
         public ICollection<Review> ReviweNav { get; set; }
