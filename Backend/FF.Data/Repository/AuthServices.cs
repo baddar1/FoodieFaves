@@ -48,7 +48,7 @@ namespace FF.Data.Repository
             {
                 return new AuthModel { Message = "User name is already registered" };
             }
-            var confirmationCode = Guid.NewGuid().ToString(); // Generate a unique confirmation code
+            var confirmationCode = Guid.NewGuid().ToString().ToUpper().Substring(0, 6); // Generate a unique confirmation code
             var pendingUser = new PendingUser
             {
                 Password = model.Password,
@@ -68,7 +68,7 @@ namespace FF.Data.Repository
             _db.PendingUsers.Add(pendingUser);
             await _db.SaveChangesAsync();
 
-            var callbackUrl = $"https://yourapi.com/api/auth/confirm-email?code={confirmationCode}"; // Update with your actual URL
+            var callbackUrl = $"https://localhost:7063/api/auth/confirm-email?code={confirmationCode}"; // Update with your actual URL
             await _emailSender.SendEmailAsync(model.Email, "Confirm your identity",
                 $"Please confirm your identity by clicking here: <a href='{callbackUrl}'>link</a>");
 

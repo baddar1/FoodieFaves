@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.Eventing.Reader;
+using System.Security.Claims;
 
 namespace FoodiFavs.Controllers
 {
@@ -166,6 +168,36 @@ namespace FoodiFavs.Controllers
             _db.SaveChanges();
             return NoContent();
         }
-
+        [HttpPost("LikeReview/{ReviewId}")]
+        public IActionResult LikeReview (int ReviewId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized(); // Return 401 if user is not logged in
+            }
+            var user = _db.Users.FirstOrDefault(u => u.UserName == userId);
+            var existingLike = _db.Likes.FirstOrDefault((l => l.UserId == user.Id && l.ReviewId == ReviewId));
+            var Review = _db.Reviews.FirstOrDefault(r => r.Id == ReviewId);
+            if (existingLike == null)
+            {
+                var Like = new Like
+                {
+                    UserId = user.Id,
+                    ReviewId = ReviewId,
+                    CreatedAt = DateTime.UtcNow,
+                };
+                Review.Likes++;
+                _db.Likes.Add(Like);
+     
+            }
+            else
+            {
+                _db.Likes.Remove(existingLike);
+                Review.Likes--;
+            }
+            _db.SaveChanges();
+            return Ok(new { success = true, Review.Likes });
+        } 
     }
 }

@@ -4,6 +4,7 @@ using FF.Data.Access.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FF.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241121125854_FavoriteRestaurants")]
+    partial class FavoriteRestaurants
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,26 +33,6 @@ namespace FF.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Admins");
-                });
-
-            modelBuilder.Entity("FF.Models.FavoriteBlogger", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("BloggerId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int?>("RestaurantId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId", "BloggerId");
-
-                    b.HasIndex("BloggerId");
-
-                    b.HasIndex("RestaurantId");
-
-                    b.ToTable("FavoriteBloggers");
                 });
 
             modelBuilder.Entity("FF.Models.FavoriteRestaurants", b =>
@@ -444,6 +427,9 @@ namespace FF.Data.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -456,6 +442,8 @@ namespace FF.Data.Migrations
                     b.HasIndex("ApplicationUserId")
                         .IsUnique()
                         .HasFilter("[ApplicationUserId] IS NOT NULL");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Users");
 
@@ -609,39 +597,31 @@ namespace FF.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("FF.Models.FavoriteBlogger", b =>
+            modelBuilder.Entity("RestaurantUser", b =>
                 {
-                    b.HasOne("FF.Models.User", "Blogger")
-                        .WithMany()
-                        .HasForeignKey("BloggerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<int>("FavoriteRestaurantsId")
+                        .HasColumnType("int");
 
-                    b.HasOne("FF.Models.Restaurant", null)
-                        .WithMany("FavoriteBloggers")
-                        .HasForeignKey("RestaurantId");
+                    b.Property<string>("UsersId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.HasOne("FF.Models.User", "User")
-                        .WithMany("FavoriteBloggers")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasKey("FavoriteRestaurantsId", "UsersId");
 
-                    b.Navigation("Blogger");
+                    b.HasIndex("UsersId");
 
-                    b.Navigation("User");
+                    b.ToTable("RestaurantUser");
                 });
 
             modelBuilder.Entity("FF.Models.FavoriteRestaurants", b =>
                 {
                     b.HasOne("FF.Models.Restaurant", "Restaurant")
-                        .WithMany("FavoriteRestaurants")
+                        .WithMany()
                         .HasForeignKey("RestaurantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("FF.Models.User", "User")
-                        .WithMany("FavoriteRestaurants")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -769,9 +749,15 @@ namespace FF.Data.Migrations
                         .WithOne("UserDetails")
                         .HasForeignKey("FF.Models.User", "ApplicationUserId");
 
+                    b.HasOne("FF.Models.User", "UserNav")
+                        .WithMany("FavoriteBloggers")
+                        .HasForeignKey("UserId");
+
                     b.Navigation("AdminNav");
 
                     b.Navigation("ApplicationUser");
+
+                    b.Navigation("UserNav");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -825,6 +811,21 @@ namespace FF.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RestaurantUser", b =>
+                {
+                    b.HasOne("FF.Models.Restaurant", null)
+                        .WithMany()
+                        .HasForeignKey("FavoriteRestaurantsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FF.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("FF.Models.Admin", b =>
                 {
                     b.Navigation("ManageRestaurants");
@@ -836,10 +837,6 @@ namespace FF.Data.Migrations
 
             modelBuilder.Entity("FF.Models.Restaurant", b =>
                 {
-                    b.Navigation("FavoriteBloggers");
-
-                    b.Navigation("FavoriteRestaurants");
-
                     b.Navigation("Orders");
 
                     b.Navigation("ReviweNav");
@@ -861,8 +858,6 @@ namespace FF.Data.Migrations
             modelBuilder.Entity("FF.Models.User", b =>
                 {
                     b.Navigation("FavoriteBloggers");
-
-                    b.Navigation("FavoriteRestaurants");
 
                     b.Navigation("Likes");
 

@@ -2,6 +2,7 @@
 using FF.Models.Secuirty;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace FF.Data.Access.Data
 {
@@ -19,6 +20,9 @@ namespace FF.Data.Access.Data
         public DbSet<PendingUser> PendingUsers { get; set; }
         public DbSet<Points> Points { get; set; }
         public DbSet<Order> Orders { get; set; }
+        public DbSet<Like> Likes { get; set; }
+        public DbSet<FavoriteRestaurants> FavoriteRestaurants { get; set; }
+        public DbSet<FavoriteBlogger> FavoriteBloggers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -98,7 +102,30 @@ namespace FF.Data.Access.Data
                    Email = "Mohammadbaddar@gmail.com"
                }
            );
+            builder.Entity<FavoriteRestaurants>().
+                HasKey(f => new { f.UserId, f.RestaurantId });
 
+
+            builder.Entity<FavoriteRestaurants>()
+             .HasOne(f => f.Restaurant)
+             .WithMany(r => r.FavoriteRestaurants)
+             .HasForeignKey(e => e.RestaurantId);
+
+            builder.Entity<FavoriteRestaurants>()
+             .HasOne(f => f.User)
+             .WithMany(r => r.FavoriteRestaurants)
+             .HasForeignKey(e => e.UserId);
+
+            builder.Entity<FavoriteBlogger>().
+                HasKey(f => new { f.UserId, f.BloggerId });
+
+            builder.Entity<FavoriteBlogger>().
+                HasOne(f => f.User)
+                .WithMany(u => u.FavoriteBloggers)
+                .HasForeignKey(e => e.UserId);
+
+
+            
         }
 
     }
