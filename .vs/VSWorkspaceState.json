@@ -3,10 +3,11 @@
     "",
     "\\Backend",
     "\\Backend\\FF.Data",
+    "\\Backend\\FF.Data\\Data",
     "\\Backend\\FoodiFavs",
     "\\Backend\\FoodiFavs\\Controllers",
     "\\Backend\\Models"
   ],
-  "SelectedNode": "\\Backend\\FoodiFavs.sln",
+  "SelectedNode": "\\Backend\\FF.Data\\Data\\ApplicationDbContext.cs",
   "PreviewInSolutionExplorer": false
 }
