@@ -1,19 +1,21 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace FF.Models
 {
-    public class FavoriteRestaurants
+    
+    public class FavoriteBlogger
     {
         
         public string UserId { get; set; }
         public User User { get; set; }
-        public int RestaurantId { get; set; }
-        public Restaurant Restaurant { get; set; }
+        
+        public string BloggerId { get; set; }
+        public User Blogger { get; set; }
     }
 }

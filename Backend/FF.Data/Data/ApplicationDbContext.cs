@@ -22,6 +22,7 @@ namespace FF.Data.Access.Data
         public DbSet<Order> Orders { get; set; }
         public DbSet<Like> Likes { get; set; }
         public DbSet<FavoriteRestaurants> FavoriteRestaurants { get; set; }
+        public DbSet<FavoriteBlogger> FavoriteBloggers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -103,8 +104,28 @@ namespace FF.Data.Access.Data
            );
             builder.Entity<FavoriteRestaurants>().
                 HasKey(f => new { f.UserId, f.RestaurantId });
-            
 
+
+            builder.Entity<FavoriteRestaurants>()
+             .HasOne(f => f.Restaurant)
+             .WithMany(r => r.FavoriteRestaurants)
+             .HasForeignKey(e => e.RestaurantId);
+
+            builder.Entity<FavoriteRestaurants>()
+             .HasOne(f => f.User)
+             .WithMany(r => r.FavoriteRestaurants)
+             .HasForeignKey(e => e.UserId);
+
+            builder.Entity<FavoriteBlogger>().
+                HasKey(f => new { f.UserId, f.BloggerId });
+
+            builder.Entity<FavoriteBlogger>().
+                HasOne(f => f.User)
+                .WithMany(u => u.FavoriteBloggers)
+                .HasForeignKey(e => e.UserId);
+
+
+            
         }
 
     }

@@ -36,14 +36,15 @@ namespace FF.Models
         //Adding rerlationship Between Notification and User
         public ICollection<Notification>? Notifications { get; set; }
         //Adding rerlationship Between Restaurant and User
-        public ICollection<Restaurant>? FavoriteRestaurants {  get; set; }
+        public ICollection<FavoriteRestaurants>? FavoriteRestaurants { get; set; } = new List<FavoriteRestaurants>();
+        public ICollection<FavoriteBlogger>? FavoriteBloggers { get; set; } = new List<FavoriteBlogger>();
         //Adding Relationship in the User
-        public string? UserId { get; set; }
-        [ForeignKey("UserId")]
-        [ValidateNever]
-        public User? UserNav { get; set; }
+        //public string? UserId { get; set; }
+        //[ForeignKey("UserId")]
+        //[ValidateNever]
+        //public User? UserNav { get; set; }
         //Navigation for the User Nav
-        public ICollection<User>? FavoriteBloggers { get; set; }
+        //public ICollection<User>? FavoriteBloggers { get; set; }
         //Adding rerlationship Between Reviwe and User
         public ICollection<Review>? Reviews { get; set; }
 

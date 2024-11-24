@@ -53,6 +53,38 @@ namespace FoodiFavs.Controllers
             }
 
         }
+        [HttpPost("Add-Favorite-Blogger")]
+        public async Task<IActionResult> AddFavoriteBlogger(string BloggerId)
+        {
+
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userName == null)
+            {
+                return Unauthorized(); // Return 401 if user is not logged in
+            }
+            var user = _db.Users.FirstOrDefault(u => u.UserName == userName);
+            var Blogger = _db.Users.FirstOrDefault(b => b.Id == BloggerId);
+
+            var FavoriteBloggers = _db.FavoriteBloggers.FirstOrDefault(f => f.BloggerId == BloggerId && f.UserId == user.Id);
+            if (FavoriteBloggers is null)
+            {
+                var Favorite = new FavoriteBlogger
+                {
+                    BloggerId = BloggerId,
+                    UserId = user.Id
+                };
+                _db.FavoriteBloggers.Add(Favorite);
+                _db.SaveChanges();
+                return Ok($"The {Blogger.UserName} has been successfully added to your favorites list !!");
+            }
+            else
+            {
+                _db.FavoriteBloggers.Remove(FavoriteBloggers);
+                _db.SaveChanges();
+                return Ok($"The {Blogger.UserName} has been successfully removed from your favorites list !!");
+            }
+
+        }
         [HttpGet("Get-Favorite-Restaurants")]
         public async Task<IActionResult> GetFavoriteRestaurants()
         {
