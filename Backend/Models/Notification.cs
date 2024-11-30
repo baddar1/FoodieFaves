@@ -25,6 +25,9 @@ namespace FF.Models
         public User UserNav { get; set; }
         Restaurant FavRestaurant { get; set; }
         User FavBlogger { get; set; }
-     
+        public string Message { get; set; } // Add message to store notification content
+        public DateTime CreatedAt { get; set; } // When the notification was created
+        public bool IsRead { get; set; } // To mark if the user has read the notification
+
     }
 }
