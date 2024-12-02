@@ -14,10 +14,10 @@ namespace FF.Models
         [Key]
         public int Id { get; set; }
         //Adding Relationship One To One Between Reviwe and Notification
-        public int ReviewId { get; set; }
+        public int? ReviewId { get; set; }
         [ForeignKey("ReviewId")]
         [ValidateNever]
-        public Review ReviewNav { get; set; }
+        public Review? ReviewNav { get; set; }
         //Adding Relationship One To Many Between User and Notification
         public string UserId { get; set; }
         [ForeignKey("UserId")]

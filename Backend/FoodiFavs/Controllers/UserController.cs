@@ -54,8 +54,10 @@ namespace FoodiFavs.Controllers
 
         }
         [HttpPost("Add-Favorite-Blogger")]
+
         public async Task<IActionResult> AddFavoriteBlogger(string BloggerId)
         {
+          
             var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userName == null)
             {
@@ -80,9 +82,9 @@ namespace FoodiFavs.Controllers
                 };
                 _db.FavoriteBloggers.Add(favorite);
                 _db.SaveChanges();
-
+                
                 // Create a notification for the blogger
-                var notification = new Notification
+               var notification = new Notification
                 {
                     UserId = BloggerId, // Notify the blogger
                     Message = $"{user.UserName} has added you as a favorite blogger!",
@@ -98,8 +100,10 @@ namespace FoodiFavs.Controllers
             else
             {
                 _db.FavoriteBloggers.Remove(favoriteBloggers);
+              // Remove the message ****************
                 _db.SaveChanges();
                 return Ok($"The {blogger.UserName} has been successfully removed from your favorites list!");
+                //return Ok("Removes");
             }
         }
 
