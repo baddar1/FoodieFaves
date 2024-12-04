@@ -72,16 +72,17 @@ namespace FoodiFavs.Controllers
             }
 
             var restaurant = await _db.Restaurants.FirstOrDefaultAsync(r => r.Id == obj.RestaurantId);
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == obj.UserId);
-            if (user == null) 
-            {
-                return NotFound("User not found.");
-            }
+            
             if (restaurant == null) 
             {
                 return NotFound("Restaurant not found.");
             }
-     
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userName == null)
+            {
+                return Unauthorized(); // Return 401 if user is not logged in
+            }
+            var user = _db.Users.FirstOrDefault(u => u.UserName == userName);
             Review model = new()
             {
                 Rating=obj.Rating,
@@ -89,7 +90,7 @@ namespace FoodiFavs.Controllers
                 UserId=user.Id,
                 RestaurantId=obj.RestaurantId,
             };
-
+            
             _db.Reviews.Add(model);
             var userRestaurantPoints = await _db.Points
             .FirstOrDefaultAsync(p => p.UserId == user.Id && p.RestaurantId == obj.RestaurantId);
@@ -110,7 +111,7 @@ namespace FoodiFavs.Controllers
                     RestaurantId = obj.RestaurantId,
                     PointsForEachRestaurant = 5,
                 };
-                notification.Message = $"{user.UserName} Congratulations on posting your first review You've earned 5 points for your contribution!";
+                notification.Message = $"{user.UserName} Congratulations on posting your first review on {restaurant.Name} You've earned 5 points for your contribution!";
                    
                 _db.Points.Add(userRestaurantPoints);
             }
@@ -121,6 +122,7 @@ namespace FoodiFavs.Controllers
                 notification.Message = $"{user.UserName} You've earned 5 points for your contribution y!";
 
             }
+            _db.Notifications.Add(notification);
             await _db.SaveChangesAsync();
 
             var allRatings = await _db.Reviews
@@ -153,7 +155,7 @@ namespace FoodiFavs.Controllers
                 _db.Notifications.Add(notificationReview);
             }
             await _db.SaveChangesAsync();
-            return Ok(obj);
+            return Ok();
         }
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -198,7 +200,7 @@ namespace FoodiFavs.Controllers
             _db.SaveChanges();
             return NoContent();
         }
-        [HttpPost("LikeReview/{ReviewId}")]
+        [HttpPost("LikeReview")]
         public IActionResult LikeReview (int ReviewId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -227,6 +229,7 @@ namespace FoodiFavs.Controllers
                         Message = $"{user.UserName} liked your review.",
                         CreatedAt = DateTime.UtcNow,
                         IsRead = false,
+                        ReviewId=ReviewId,
                         NotificationType="Like"
                     };
                     _db.Notifications.Add(notification);
@@ -265,10 +268,11 @@ namespace FoodiFavs.Controllers
                 // notify the admin for reported review
                 var notification = new Notification
                 {
-                    UserId = "admin",
+                    UserId = "1",
                     Message = $"Review by {review.UserId} has been reported for offensive content.",
                     CreatedAt = DateTime.Now,
-                    IsRead = false
+                    IsRead = false,
+                    NotificationType="Report"
                 };
                 _db.Notifications.Add(notification);
             }
