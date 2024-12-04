@@ -23,8 +23,15 @@ namespace FF.Models
         [ForeignKey("UserId")]
         [ValidateNever]
         public User UserNav { get; set; }
+        public int? RestaurantId { get; set; }
+        [ForeignKey("RestaurantId")]
+        [ValidateNever]
         Restaurant FavRestaurant { get; set; }
-        User FavBlogger { get; set; }
+        public int? LikeId { get; set; }
+        [ForeignKey("LikeId")]
+        [ValidateNever]
+        public Like? LikeNav { get; set; }
+        public string NotificationType { get; set; }
         public string Message { get; set; } // Add message to store notification content
         public DateTime CreatedAt { get; set; } // When the notification was created
         public bool IsRead { get; set; } // To mark if the user has read the notification

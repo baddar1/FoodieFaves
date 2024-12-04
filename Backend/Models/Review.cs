@@ -20,6 +20,8 @@ namespace FF.Models
         public string? Comment{ get; set; }
         public int? Likes { get; set; } = 0;
         public int? Points { get; set; } = 0;
+        public bool? IsReported { get; set; }
+        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
         //Navigation for the Relationship Many To one Brtween Restaurant and Reviwe
         public int RestaurantId { get; set; }
         [ForeignKey("RestaurantId")]

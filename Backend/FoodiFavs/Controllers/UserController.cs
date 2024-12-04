@@ -89,7 +89,8 @@ namespace FoodiFavs.Controllers
                     UserId = BloggerId, // Notify the blogger
                     Message = $"{user.UserName} has added you as a favorite blogger!",
                     CreatedAt = DateTime.Now,
-                    IsRead = false
+                    IsRead = false,
+                    NotificationType="Favorite Blogger"
                 };
 
                 _db.Notifications.Add(notification);
@@ -100,7 +101,14 @@ namespace FoodiFavs.Controllers
             else
             {
                 _db.FavoriteBloggers.Remove(favoriteBloggers);
-              // Remove the message ****************
+                // Remove the message ****************
+              
+                var notification = _db.Notifications.FirstOrDefault(u =>
+                    u.UserId == BloggerId && u.Message.Contains($"{user.UserName} has added you as a favorite blogger!") && !u.IsRead);
+                if (notification != null)
+                {
+                    _db.Notifications.Remove(notification);
+                }
                 _db.SaveChanges();
                 return Ok($"The {blogger.UserName} has been successfully removed from your favorites list!");
                 //return Ok("Removes");
@@ -173,6 +181,38 @@ namespace FoodiFavs.Controllers
             notification.IsRead = true;
             _db.SaveChanges();
             return Ok(); // Notification marked as read
+        }
+        [HttpGet("Get-All-Reviews")]
+        public async Task<IActionResult> GetAllReviews(string Id)
+        {
+            if (Id == null) 
+            {
+                return BadRequest("Invalid restaurant ID.");
+            }
+
+            var user = _db.Users
+                .Where(u => u.Id==Id)
+                .Select(u=> new 
+                {
+                    u.Id,
+                    u.UserName,
+
+                    Reviews = u.Reviews.Select(review => new
+                    {
+                        review.Id,
+                        review.RestaurantNav.Name,
+                        review.Rating,
+                        review.Comment,
+                        review.CreatedAt,
+                    }).ToList()
+                }).FirstOrDefault();
+
+            if (user == null)
+                return NotFound();
+
+            return Ok(user);
+
+
         }
 
     }
