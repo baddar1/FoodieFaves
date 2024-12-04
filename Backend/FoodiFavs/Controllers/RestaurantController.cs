@@ -21,16 +21,33 @@ namespace FoodiFavs.Controllers
             _db = db;
             _unitOfWork = unitOfWork;   
         }
-        [HttpGet("Get-Restaurant-Info")] //End point
+        [HttpGet("Get-All-Restaurants")] //End point
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<Restaurant>>> GetRestaurants()
+        public async Task<IActionResult> GetAllRestaurants()
         {
-            var restaurantsWithReviews = await _db.Restaurants
-                .Include(r => r.ReviweNav)
-                .ThenInclude(r=>r.UserNav)
+            // Fetch all restaurants from the database
+            var restaurants = await _db.Restaurants
+                .Select(r => new
+                {
+                    r.Id,
+                    r.Name,
+                    r.Rating,
+                    r.Cuisine,
+                    r.Budget,
+                    r.Location,
+                    r.ImgUrl,
+                    r.Description
+                })
                 .ToListAsync();
 
-            return Ok(restaurantsWithReviews);
+            // Check if no restaurants are found
+            if (!restaurants.Any())
+            {
+                return NotFound("No restaurants found.");
+            }
+
+            // Return the list of restaurants
+            return Ok(restaurants);
         }
 
         [HttpGet("GetRestaurants-ById")]
@@ -43,7 +60,30 @@ namespace FoodiFavs.Controllers
             {
                 return BadRequest();
             }
-            var GetRestaurant = _db.Restaurants.FirstOrDefault(r => r.Id==Id);
+            var GetRestaurant = _db.Restaurants
+                .Where(r => r.Id == Id)
+                .Select(r => new
+                {
+                    r.Id,
+                    r.Name,
+                    r.Rating,
+                    r.Cuisine,
+                    r.Budget,
+                    r.Location,
+                    r.ImgUrl,
+                    r.Description,
+                    Reviews = r.ReviweNav.Select(review => new
+                    {
+                        review.Id,
+                        review.Rating,
+                        review.Comment,
+                        review.CreatedAt,
+                        UserName = review.UserNav.UserName,
+                        UserId=review.UserNav.Id,
+                        
+                    }).ToList()
+                })
+                .FirstOrDefault();
             if (GetRestaurant!=null)
             {
                 return Ok(GetRestaurant);
@@ -58,7 +98,7 @@ namespace FoodiFavs.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        //[Authorize(Roles ="Admin")]
+        [Authorize(Roles ="Admin")]
         public ActionResult AddRestaurant([FromBody] RestaurantDto obj)
         {
 
@@ -92,7 +132,7 @@ namespace FoodiFavs.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpDelete("DeleteRestaurant-ById ")]
-        //[Authorize(Roles ="Admin")]
+        [Authorize(Roles ="Admin")]
         public IActionResult DeleteRestaurant(int Id)
         {
 
@@ -114,7 +154,7 @@ namespace FoodiFavs.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPut("UpadteRestaurant-ById")]
-        //[Authorize(Roles ="Admin")]
+        [Authorize(Roles ="Admin")]
         public IActionResult UpdateRestaurant(int Id,[FromBody]UpdateRestaurantDto obj)
         {
   
@@ -136,8 +176,98 @@ namespace FoodiFavs.Controllers
             _db.SaveChanges();
             return NoContent();
         }
-       
-       
+        [HttpGet("SearchRestaurants")]
+        public async Task<IActionResult> SearchRestaurants(string keyword)
+        {
+            if (string.IsNullOrWhiteSpace(keyword))
+            {
+                return BadRequest(new { message = "Search keyword cannot be empty." });
+            }
+
+            var normalizedKeyword = keyword.Replace(" ", "").ToLower();
+
+            var query = _db.Restaurants
+                .Where(r =>
+                    (EF.Functions.Like(r.Name.Replace(" ", "").ToLower(), $"%{normalizedKeyword}%")));
+
+            var results = await query
+                .OrderBy(r => r.Name)
+                .Select(r => new
+                {
+                    r.Id,
+                    r.Name,
+                    r.Description,
+                    r.Rating,
+                    r.Location,
+                    r.Cuisine,
+                    r.Budget,
+                    r.ImgUrl
+                })
+                .ToListAsync();
+
+            if (!results.Any())
+            {
+                return NotFound(new { message = "No matching restaurants found." });
+            }
+
+            return Ok(results);
+        }
+        [HttpGet("Filter-By-Cuisine")]
+        public async Task<IActionResult> Filter([FromQuery] string? cuisine, [FromQuery] string? budget)
+        {
+            // Build the query to filter restaurants
+            var query = _db.Restaurants.AsQueryable();
+
+            // Filter restaurants based on cuisine (if provided)
+            if (!string.IsNullOrEmpty(cuisine))
+            {
+                query = query.Where(r => r.Cuisine.ToLower() == cuisine.ToLower());
+            }
+
+            // Filter restaurants based on budget (if provided)
+            if (!string.IsNullOrEmpty(budget))
+            {
+                switch (budget.ToLower())
+                {
+                    case "low":
+                        query = query.Where(r => r.Budget >= 1 || r.Budget < 5); // Assuming "low" budget is less than 10
+                        break;
+                    case "mid":
+                        query = query.Where(r => r.Budget >= 5 && r.Budget <10 ); // "mid" budget is between 10 and 30
+                        break;
+                    case "high":
+                        query = query.Where(r => r.Budget >= 10); // "high" budget is 30 and above
+                        break;
+                    default:
+                        return BadRequest("Invalid budget filter. Use 'low', 'mid', or 'high'.");
+                }
+            }
+
+            // Sorting restaurants by Budget first and then by Cuisine
+            var sortedRestaurants = await query
+                .Select(r => new
+                {
+                    r.Id,
+                    r.Name,
+                    r.Rating,
+                    r.Cuisine,
+                    r.Budget,
+                    r.Location,
+                    r.ImgUrl
+                })
+                .OrderBy(r => r.Budget)      // Sort by Budget (ascending)
+                .ThenBy(r => r.Cuisine)      // Then sort by Cuisine (alphabetical order)
+                .ToListAsync();
+
+            // If no results found
+            if (!sortedRestaurants.Any())
+            {
+                return NotFound("No restaurants found matching the given criteria.");
+            }
+
+            return Ok(sortedRestaurants);
+        }
+
 
     }
 }

@@ -63,7 +63,33 @@ namespace FF.Data.Access.Data
                     Cuisine = "Burger",
                     Budget = 4,
                     ImgUrl = "Photo",
-                }
+                },
+                new Restaurant
+                {
+                    Id =3,
+                    Name = "saj",
+                    phoneNumber = "0799902599",
+                    Email = string.Empty,
+                    Location = "Jubiha",
+                    Cuisine = "shawerma",
+                    Budget = 4.1,
+                    ImgUrl = "Photo",
+
+
+                },
+                new Restaurant
+                 {
+                     Id =4,
+                     Name = "Reem",
+                     phoneNumber = "0799902599",
+                     Email = string.Empty,
+                     Location = "Jubiha",
+                     Cuisine = "shawerma",
+                     Budget = 2,
+                     ImgUrl = "Photo",
+
+
+                 }
                 );
         builder.Entity<Review>().HasData(
                 new Review
@@ -76,6 +102,15 @@ namespace FF.Data.Access.Data
                     Likes = 100
                 },
                 new Review
+                  {
+                      Id = 3,
+                      UserId="1",
+                      RestaurantId = 3, // Foreign key to Restaurant
+                      Rating = 4.1,
+                      Comment = "so Juciyy !!",
+                      Likes = 100
+                  },
+                new Review
                 {
                     Id = 2,
                     UserId="2",
@@ -83,8 +118,26 @@ namespace FF.Data.Access.Data
                     Rating = 4.5,
                     Comment = "Nashville Fried Chicken, so perfect !!",
                     Likes = 100
+                },
+                new Review
+                 {
+                     Id = 4,
+                     UserId="2",
+                     RestaurantId = 1, // Foreign key to Restaurant
+                     Rating = 4.5,
+                     Comment = "Nashville Fried Chicken, so perfect !!",
+                     Likes = 105
+                 },
+                new Review
+                {
+                     Id = 5,
+                     UserId="2",
+                     RestaurantId = 1, // Foreign key to Restaurant
+                     Rating = 4.5,
+                     Comment = "Nashville Fried Chicken, so perfect !!",
+                     Likes = 99
                 }
-                
+
             );
         builder.Entity<User>().HasData(
                new User

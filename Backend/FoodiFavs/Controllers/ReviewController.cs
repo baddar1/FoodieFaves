@@ -63,7 +63,7 @@ namespace FoodiFavs.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        //[Authorize]
+        [Authorize]
         public async Task<ActionResult> AddReview([FromBody] ReviewDto obj)
         {
             if (obj == null)
@@ -93,7 +93,14 @@ namespace FoodiFavs.Controllers
             _db.Reviews.Add(model);
             var userRestaurantPoints = await _db.Points
             .FirstOrDefaultAsync(p => p.UserId == user.Id && p.RestaurantId == obj.RestaurantId);
-
+            var notification = new Notification
+            {
+                UserId = user.Id,
+                Message ="",
+                CreatedAt = DateTime.Now,
+                IsRead = false,
+                NotificationType="Points"
+            };
             if (userRestaurantPoints == null)
             {
                 // If no points exist, create a new record for the user-restaurant pair
@@ -101,14 +108,18 @@ namespace FoodiFavs.Controllers
                 {
                     UserId = user.Id,
                     RestaurantId = obj.RestaurantId,
-                    PointsForEachRestaurant = 5 
+                    PointsForEachRestaurant = 5,
                 };
+                notification.Message = $"{user.UserName} Congratulations on posting your first review You've earned 5 points for your contribution!";
+                   
                 _db.Points.Add(userRestaurantPoints);
             }
             else
             {
                 // If points already exist, update the points
-                userRestaurantPoints.PointsForEachRestaurant += 5; 
+                userRestaurantPoints.PointsForEachRestaurant += 5;
+                notification.Message = $"{user.UserName} You've earned 5 points for your contribution y!";
+
             }
             await _db.SaveChangesAsync();
 
@@ -117,11 +128,30 @@ namespace FoodiFavs.Controllers
              .Select(r => r.Rating)
              .ToListAsync();
 
-            
-
             restaurant.Rating = allRatings.Average();
 
             _db.Restaurants.Update(restaurant);
+            await _db.SaveChangesAsync();
+
+            // Find all the Users whose following the blogger 
+            var followers = _db.FavoriteBloggers
+               .Where(f => f.BloggerId == user.Id) //Make suer that we search in the same blogger
+               .Select(f => f.UserId) // Get the followers Id
+               .ToList();
+
+            // Loob to notify to all Followers
+            foreach (var followerId in followers)
+            {
+                var notificationReview = new Notification
+                {
+                    UserId = followerId, 
+                    Message = $"{user.UserName}, your favorite blogger, has written a new review for {restaurant.Name}!",
+                    CreatedAt = DateTime.Now,
+                    IsRead = false,
+                    NotificationType="Review"
+                };
+                _db.Notifications.Add(notificationReview);
+            }
             await _db.SaveChangesAsync();
             return Ok(obj);
         }
@@ -130,7 +160,7 @@ namespace FoodiFavs.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpDelete("DeleteReview-ById ")]
-        //[Authorize(Roles ="Admin")]
+        [Authorize(Roles ="Admin")]
         public IActionResult DeleteReview(int Id)
         {
 
@@ -152,7 +182,7 @@ namespace FoodiFavs.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPut("UpadteReview-ById")]
-        //[Authorize(Roles ="Admin")]
+        [Authorize(Roles ="Admin")]
         public IActionResult UpdateReview(int Id, [FromBody] ReviewDto obj)
         {
 
@@ -189,15 +219,104 @@ namespace FoodiFavs.Controllers
                 };
                 Review.Likes++;
                 _db.Likes.Add(Like);
-     
+                if (Review.UserId != user.Id) 
+                {
+                    var notification = new Notification
+                    {
+                        UserId = Review.UserId, // Notify the Blogger
+                        Message = $"{user.UserName} liked your review.",
+                        CreatedAt = DateTime.UtcNow,
+                        IsRead = false,
+                        NotificationType="Like"
+                    };
+                    _db.Notifications.Add(notification);
+                }
+
             }
             else
             {
                 _db.Likes.Remove(existingLike);
                 Review.Likes--;
+                var notification = _db.Notifications
+                .FirstOrDefault(n => n.UserId == Review.UserId
+                 && n.Message == $"{user.UserName} liked your review.");
+                if (notification != null)
+                {
+                    _db.Notifications.Remove(notification);
+                }
             }
             _db.SaveChanges();
             return Ok(new { success = true, Review.Likes });
-        } 
+        }
+        [HttpPost("Report-Review")]
+        public async Task<IActionResult> ReportReview(int reviewId)
+        {
+            var review = await _db.Reviews.FirstOrDefaultAsync(r => r.Id == reviewId);
+            if (review == null)
+            {
+                return NotFound("Review not found.");
+            }
+
+            if (review.Comment != null)
+            {
+
+                review.IsReported = true;
+
+                // notify the admin for reported review
+                var notification = new Notification
+                {
+                    UserId = "admin",
+                    Message = $"Review by {review.UserId} has been reported for offensive content.",
+                    CreatedAt = DateTime.Now,
+                    IsRead = false
+                };
+                _db.Notifications.Add(notification);
+            }
+            else
+            {
+                return Ok("The review is clean no comment detected.");
+            }
+
+            await _db.SaveChangesAsync();
+            return Ok("Review reported successfully.");
+        }
+        [HttpPost("Sort-By-Likes")]
+        public async Task<IActionResult> SorteReviewsdByLikes(int restaurantId)
+        {
+            if (restaurantId == 0)
+            {
+                return BadRequest("Invalid Restaurant ID");
+            }
+
+            // Get all reviews for the restaurant
+            var reviews = await _db.Reviews
+                .Where(r => r.RestaurantId == restaurantId)
+                .ToListAsync();
+
+            if (reviews == null || !reviews.Any())
+            {
+                return NotFound("No reviews found for the given restaurant.");
+            }
+
+            
+            var sortedReviews = reviews
+                .OrderByDescending(r => r.Likes) 
+                .Select(r => new
+                {
+                    r.Id,
+                    r.Comment,
+                    r.Rating,
+                    r.UserId,
+                    r.RestaurantId,
+                    r.Likes,  
+                    r.CreatedAt
+                })
+                .ToList();
+
+            return Ok(sortedReviews);
+        }
+
+
+
     }
 }

@@ -4,6 +4,7 @@ using FF.Data.Access.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FF.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241204000039_SeedOneReview1")]
+    partial class SeedOneReview1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -390,7 +393,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 1,
                             Comment = "Nashville Fried Chicken, so so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 4, 0, 11, 56, 466, DateTimeKind.Utc).AddTicks(7921),
+                            CreatedAt = new DateTime(2024, 12, 4, 0, 0, 38, 626, DateTimeKind.Utc).AddTicks(4776),
                             Likes = 100,
                             Points = 0,
                             Rating = 4.7000000000000002,
@@ -401,7 +404,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 3,
                             Comment = "so Juciyy !!",
-                            CreatedAt = new DateTime(2024, 12, 4, 0, 11, 56, 466, DateTimeKind.Utc).AddTicks(7934),
+                            CreatedAt = new DateTime(2024, 12, 4, 0, 0, 38, 626, DateTimeKind.Utc).AddTicks(4782),
                             Likes = 100,
                             Points = 0,
                             Rating = 4.0999999999999996,
@@ -412,7 +415,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 2,
                             Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 4, 0, 11, 56, 466, DateTimeKind.Utc).AddTicks(7936),
+                            CreatedAt = new DateTime(2024, 12, 4, 0, 0, 38, 626, DateTimeKind.Utc).AddTicks(4784),
                             Likes = 100,
                             Points = 0,
                             Rating = 4.5,
@@ -423,19 +426,8 @@ namespace FF.Data.Migrations
                         {
                             Id = 4,
                             Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 4, 0, 11, 56, 466, DateTimeKind.Utc).AddTicks(7938),
+                            CreatedAt = new DateTime(2024, 12, 4, 0, 0, 38, 626, DateTimeKind.Utc).AddTicks(4785),
                             Likes = 105,
-                            Points = 0,
-                            Rating = 4.5,
-                            RestaurantId = 1,
-                            UserId = "2"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 4, 0, 11, 56, 466, DateTimeKind.Utc).AddTicks(7940),
-                            Likes = 99,
                             Points = 0,
                             Rating = 4.5,
                             RestaurantId = 1,

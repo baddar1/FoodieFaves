@@ -33,15 +33,10 @@ namespace FF.Models
         public double Budget { get; set; }
         [Required]
         public string ImgUrl { get; set; }
+        public string? Description { get; set; }
         public ICollection<FavoriteRestaurants>? FavoriteRestaurants { get; set; }
         public ICollection<FavoriteBlogger> FavoriteBloggers { get; set; }
         public ICollection<Points> UserRestaurantPoints { get; set; }
-        //Adding Relationship One To One Between User and Restaurant
-        //public string? UserId { get; set; }
-        //[ForeignKey("UserId")]
-        //[ValidateNever]
-       // public ICollection<User>? Users { get; set; }
-        //Adding Relationships Many To One Between Restaurnat and Reviwe
         [ValidateNever]
         public ICollection<Review> ReviweNav { get; set; }
         public string? AdminId { get; set; }

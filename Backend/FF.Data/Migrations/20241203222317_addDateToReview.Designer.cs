@@ -4,6 +4,7 @@ using FF.Data.Access.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FF.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241203222317_addDateToReview")]
+    partial class addDateToReview
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -307,30 +310,6 @@ namespace FF.Data.Migrations
                             Name = "X Burger",
                             Rating = 0.0,
                             phoneNumber = "0790067776"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Budget = 4.0999999999999996,
-                            Cuisine = "shawerma",
-                            Email = "",
-                            ImgUrl = "Photo",
-                            Location = "Jubiha",
-                            Name = "saj",
-                            Rating = 0.0,
-                            phoneNumber = "0799902599"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Budget = 2.0,
-                            Cuisine = "shawerma",
-                            Email = "",
-                            ImgUrl = "Photo",
-                            Location = "Jubiha",
-                            Name = "Reem",
-                            Rating = 0.0,
-                            phoneNumber = "0799902599"
                         });
                 });
 
@@ -390,7 +369,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 1,
                             Comment = "Nashville Fried Chicken, so so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 4, 0, 11, 56, 466, DateTimeKind.Utc).AddTicks(7921),
+                            CreatedAt = new DateTime(2024, 12, 3, 22, 23, 17, 149, DateTimeKind.Utc).AddTicks(8307),
                             Likes = 100,
                             Points = 0,
                             Rating = 4.7000000000000002,
@@ -399,43 +378,10 @@ namespace FF.Data.Migrations
                         },
                         new
                         {
-                            Id = 3,
-                            Comment = "so Juciyy !!",
-                            CreatedAt = new DateTime(2024, 12, 4, 0, 11, 56, 466, DateTimeKind.Utc).AddTicks(7934),
-                            Likes = 100,
-                            Points = 0,
-                            Rating = 4.0999999999999996,
-                            RestaurantId = 3,
-                            UserId = "1"
-                        },
-                        new
-                        {
                             Id = 2,
                             Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 4, 0, 11, 56, 466, DateTimeKind.Utc).AddTicks(7936),
+                            CreatedAt = new DateTime(2024, 12, 3, 22, 23, 17, 149, DateTimeKind.Utc).AddTicks(8318),
                             Likes = 100,
-                            Points = 0,
-                            Rating = 4.5,
-                            RestaurantId = 1,
-                            UserId = "2"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 4, 0, 11, 56, 466, DateTimeKind.Utc).AddTicks(7938),
-                            Likes = 105,
-                            Points = 0,
-                            Rating = 4.5,
-                            RestaurantId = 1,
-                            UserId = "2"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 4, 0, 11, 56, 466, DateTimeKind.Utc).AddTicks(7940),
-                            Likes = 99,
                             Points = 0,
                             Rating = 4.5,
                             RestaurantId = 1,
