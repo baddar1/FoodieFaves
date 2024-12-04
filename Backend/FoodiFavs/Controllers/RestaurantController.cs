@@ -223,20 +223,19 @@ namespace FoodiFavs.Controllers
             {
                 query = query.Where(r => r.Cuisine.ToLower() == cuisine.ToLower());
             }
-
             // Filter restaurants based on budget (if provided)
             if (!string.IsNullOrEmpty(budget))
             {
                 switch (budget.ToLower())
                 {
                     case "low":
-                        query = query.Where(r => r.Budget >= 1 || r.Budget < 5); // Assuming "low" budget is less than 10
+                        query = query.Where(r => r.Budget >= 1 || r.Budget < 5); // Assuming "low" budget is between 1 and 5
                         break;
                     case "mid":
-                        query = query.Where(r => r.Budget >= 5 && r.Budget <10 ); // "mid" budget is between 10 and 30
+                        query = query.Where(r => r.Budget >= 5 && r.Budget <10 ); // "mid" budget is between 5 and 10
                         break;
                     case "high":
-                        query = query.Where(r => r.Budget >= 10); // "high" budget is 30 and above
+                        query = query.Where(r => r.Budget >= 10); // "high" budget is 10 and above
                         break;
                     default:
                         return BadRequest("Invalid budget filter. Use 'low', 'mid', or 'high'.");

@@ -96,7 +96,7 @@ namespace FoodiFavs.Controllers
                 _db.Notifications.Add(notification);
                 _db.SaveChanges();
 
-                return Ok($"The {blogger.UserName} has been successfully added to your favorites list!");
+                return Ok($"{blogger.UserName} has been successfully added to your favorites list!");
             }
             else
             {
@@ -104,13 +104,13 @@ namespace FoodiFavs.Controllers
                 // Remove the message ****************
               
                 var notification = _db.Notifications.FirstOrDefault(u =>
-                    u.UserId == BloggerId && u.Message.Contains($"{user.UserName} has added you as a favorite blogger!") && !u.IsRead);
+                    u.UserId == BloggerId && u.Message.Contains($"{user.UserName} has added you as a favorite blogger!"));
                 if (notification != null)
                 {
                     _db.Notifications.Remove(notification);
                 }
                 _db.SaveChanges();
-                return Ok($"The {blogger.UserName} has been successfully removed from your favorites list!");
+                return Ok($"{blogger.UserName} has been successfully removed from your favorites list!");
                 //return Ok("Removes");
             }
         }
@@ -183,15 +183,18 @@ namespace FoodiFavs.Controllers
             return Ok(); // Notification marked as read
         }
         [HttpGet("Get-All-Reviews")]
-        public async Task<IActionResult> GetAllReviews(string Id)
+        public async Task<IActionResult> GetAllReviews()
         {
-            if (Id == null) 
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userName == null)
             {
-                return BadRequest("Invalid restaurant ID.");
+                return Unauthorized(); // Return 401 if user is not logged in
             }
+            var user = _db.Users.FirstOrDefault(u => u.UserName == userName);
+          
 
-            var user = _db.Users
-                .Where(u => u.Id==Id)
+            var user1 = _db.Users
+                .Where(u => u.Id==user.Id)
                 .Select(u=> new 
                 {
                     u.Id,
@@ -207,10 +210,10 @@ namespace FoodiFavs.Controllers
                     }).ToList()
                 }).FirstOrDefault();
 
-            if (user == null)
+            if (user1 == null)
                 return NotFound();
 
-            return Ok(user);
+            return Ok(user1);
 
 
         }
