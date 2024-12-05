@@ -90,8 +90,19 @@ namespace FoodiFavs.Controllers
                 UserId=user.Id,
                 RestaurantId=obj.RestaurantId,
             };
-            
+
+            //To count reviews number for each user
+            user.ReviewCount++;
+            user.TotalPoints+=5;
             _db.Reviews.Add(model);
+
+            // get the max value for each review for each user (For sorting)
+            if (model.Rating>user.TopRateReview) 
+            {
+                user.TopRateReview = model.Rating;
+                user.TopReview=model;
+            }
+
             var userRestaurantPoints = await _db.Points
             .FirstOrDefaultAsync(p => p.UserId == user.Id && p.RestaurantId == obj.RestaurantId);
             var notification = new Notification
@@ -111,6 +122,7 @@ namespace FoodiFavs.Controllers
                     RestaurantId = obj.RestaurantId,
                     PointsForEachRestaurant = 5,
                 };
+               
                 notification.Message = $"{user.UserName} Congratulations on posting your first review on {restaurant.Name} You've earned 5 points for your contribution!";
                    
                 _db.Points.Add(userRestaurantPoints);
@@ -119,6 +131,7 @@ namespace FoodiFavs.Controllers
             {
                 // If points already exist, update the points
                 userRestaurantPoints.PointsForEachRestaurant += 5;
+                
                 notification.Message = $"{user.UserName} You've earned 5 points for your contribution y!";
 
             }
@@ -165,7 +178,7 @@ namespace FoodiFavs.Controllers
         [Authorize(Roles ="Admin")]
         public IActionResult DeleteReview(int Id)
         {
-
+           
             if (Id==0)
             {
                 return BadRequest();
@@ -175,6 +188,7 @@ namespace FoodiFavs.Controllers
             {
                 return NotFound();
             }
+            Review.UserNav.ReviewCount--;
             _db.Reviews.Remove(Review);
             _db.SaveChanges();
             return NoContent();
@@ -220,6 +234,7 @@ namespace FoodiFavs.Controllers
                     CreatedAt = DateTime.UtcNow,
                 };
                 Review.Likes++;
+                user.TotalLikes++;
                 _db.Likes.Add(Like);
                 if (Review.UserId != user.Id) 
                 {
@@ -240,6 +255,7 @@ namespace FoodiFavs.Controllers
             {
                 _db.Likes.Remove(existingLike);
                 Review.Likes--;
+                user.TotalLikes--;
                 var notification = _db.Notifications
                 .FirstOrDefault(n => n.UserId == Review.UserId
                  && n.Message == $"{user.UserName} liked your review.");

@@ -4,6 +4,7 @@ using FF.Data.Access.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FF.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241205005227_MoifieingModels1")]
+    partial class MoifieingModels1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -400,7 +403,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 1,
                             Comment = "Nashville Fried Chicken, so so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 5, 1, 5, 13, 212, DateTimeKind.Utc).AddTicks(1664),
+                            CreatedAt = new DateTime(2024, 12, 5, 0, 52, 27, 5, DateTimeKind.Utc).AddTicks(5912),
                             Likes = 100,
                             Points = 0,
                             Rating = 4.7000000000000002,
@@ -411,7 +414,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 3,
                             Comment = "so Juciyy !!",
-                            CreatedAt = new DateTime(2024, 12, 5, 1, 5, 13, 212, DateTimeKind.Utc).AddTicks(1675),
+                            CreatedAt = new DateTime(2024, 12, 5, 0, 52, 27, 5, DateTimeKind.Utc).AddTicks(5919),
                             Likes = 100,
                             Points = 0,
                             Rating = 4.0999999999999996,
@@ -422,7 +425,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 2,
                             Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 5, 1, 5, 13, 212, DateTimeKind.Utc).AddTicks(1677),
+                            CreatedAt = new DateTime(2024, 12, 5, 0, 52, 27, 5, DateTimeKind.Utc).AddTicks(5921),
                             Likes = 100,
                             Points = 0,
                             Rating = 4.5,
@@ -433,7 +436,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 4,
                             Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 5, 1, 5, 13, 212, DateTimeKind.Utc).AddTicks(1679),
+                            CreatedAt = new DateTime(2024, 12, 5, 0, 52, 27, 5, DateTimeKind.Utc).AddTicks(5923),
                             Likes = 105,
                             Points = 0,
                             Rating = 4.5,
@@ -444,7 +447,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 5,
                             Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 5, 1, 5, 13, 212, DateTimeKind.Utc).AddTicks(1681),
+                            CreatedAt = new DateTime(2024, 12, 5, 0, 52, 27, 5, DateTimeKind.Utc).AddTicks(5925),
                             Likes = 99,
                             Points = 0,
                             Rating = 4.5,
@@ -553,9 +556,6 @@ namespace FF.Data.Migrations
                     b.Property<int>("TotalLikes")
                         .HasColumnType("int");
 
-                    b.Property<int>("TotalPoints")
-                        .HasColumnType("int");
-
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -580,7 +580,6 @@ namespace FF.Data.Migrations
                             ReviewCount = 0,
                             TopRateReview = 0.0,
                             TotalLikes = 0,
-                            TotalPoints = 0,
                             UserName = "YazeedNada"
                         },
                         new
@@ -591,7 +590,6 @@ namespace FF.Data.Migrations
                             ReviewCount = 0,
                             TopRateReview = 0.0,
                             TotalLikes = 0,
-                            TotalPoints = 0,
                             UserName = "Mohammadbaddar"
                         });
                 });

@@ -43,13 +43,13 @@ namespace FoodiFavs.Controllers
                 };
                 _db.FavoriteRestaurants.Add(Favorite);
                 _db.SaveChanges();
-                return Ok($"The {restaurant.Name} has been successfully added to your favorites list !!");
+                return Ok();
             }
             else
             {
                 _db.FavoriteRestaurants.Remove(FavoriteRes);
                 _db.SaveChanges();
-                return Ok($"The {restaurant.Name} has been successfully removed from your favorites list !!");
+                return Ok();
             }
 
         }
@@ -114,7 +114,52 @@ namespace FoodiFavs.Controllers
                 //return Ok("Removes");
             }
         }
+        [HttpGet("Get-Favorite-Bloggers")]
+        public async Task<IActionResult> GetFavoriteBloggers()
+        {
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = _db.Users.FirstOrDefault(u => u.UserName == userName);
 
+            if (string.IsNullOrEmpty(user.Id))
+            {
+                return Unauthorized("User is not authenticated.");
+            }
+
+           
+            var favoriteBloggers = await _db.FavoriteBloggers
+                .Where(fb => fb.UserId == user.Id)
+                .Include(fb => fb.Blogger) 
+                .Select(fb => new
+                {
+                    BloggerId = user.Id,
+                    BloggerName = fb.Blogger.UserName,
+                    TopReview = fb.Blogger.Reviews
+                .OrderByDescending(r => r.Rating) 
+                .Select(r => new
+                {
+                    Restaurant = new
+                    {
+                        r.RestaurantId,
+                        r.RestaurantNav.ImgUrl,
+                        r.RestaurantNav.Name,
+                    },
+                    ReviewId = r.Id,
+                    r.Rating,
+                    r.Comment,
+                    r.Likes,
+                    r.CreatedAt
+                })
+                .FirstOrDefault()
+                })
+                .ToListAsync();
+
+            if (!favoriteBloggers.Any())
+            {
+                return NotFound("No favorite bloggers found for the user.");
+            }
+
+            return Ok(favoriteBloggers);
+        }
         [HttpGet("Get-Favorite-Restaurants")]
         public async Task<IActionResult> GetFavoriteRestaurants()
         {
@@ -131,7 +176,17 @@ namespace FoodiFavs.Controllers
             var FavoriteList = _db.FavoriteRestaurants.
                 Where(c => c.UserId == user.Id).
                 Include(f => f.Restaurant).
-                Select(r => r.Restaurant.Name)
+                Select(r=> new
+                    { 
+                       r.Restaurant.ImgUrl,
+                       r.Restaurant.Name,
+                       r.Restaurant.Cuisine,
+                       r.Restaurant.Rating,
+                       r.Restaurant.Description
+
+                    }
+                
+                )
                 .ToList();
             if (FavoriteList.Count == 0) {
                 return Ok("The favorite List is empty !!");
@@ -139,6 +194,60 @@ namespace FoodiFavs.Controllers
 
 
             return Ok(FavoriteList);
+        }
+        [HttpDelete("Delete-Favorite-Blogger")]
+        public async Task<IActionResult> DeleteFavoriteBlogger(string bloggerId)
+        {
+            
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.UserName == userName);
+
+            if (user == null || string.IsNullOrEmpty(user.Id))
+            {
+                return Unauthorized("User is not authenticated.");
+            }
+
+            // Find the favorite blogger record
+            var favoriteBlogger = await _db.FavoriteBloggers
+                .FirstOrDefaultAsync(fb => fb.UserId == user.Id && fb.BloggerId == bloggerId);
+
+            if (favoriteBlogger == null)
+            {
+                return NotFound("Favorite blogger not found for the user.");
+            }
+
+            // Remove the favorite blogger
+            _db.FavoriteBloggers.Remove(favoriteBlogger);
+            await _db.SaveChangesAsync();
+
+            return Ok("Favorite blogger removed successfully." );
+        }
+        [HttpDelete("DeleteFavoriteRestaurant")]
+        public async Task<IActionResult> DeleteFavoriteRestaurant(int restaurantId)
+        {
+           
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.UserName == userName);
+
+            if (user == null || string.IsNullOrEmpty(user.Id))
+            {
+                return Unauthorized("User is not authenticated.");
+            }
+
+            // Find the favorite restaurant record
+            var favoriteRestaurant = await _db.FavoriteRestaurants
+                .FirstOrDefaultAsync(fr => fr.UserId == user.Id && fr.RestaurantId == restaurantId);
+
+            if (favoriteRestaurant == null)
+            {
+                return NotFound("Favorite restaurant not found for the user.");
+            }
+
+            // Remove the favorite restaurant
+            _db.FavoriteRestaurants.Remove(favoriteRestaurant);
+            await _db.SaveChangesAsync();
+
+            return Ok("Favorite restaurant removed successfully." );
         }
         [HttpGet("Get-Notifications")]
         public async Task<IActionResult> GetNotifications()
@@ -183,7 +292,7 @@ namespace FoodiFavs.Controllers
             return Ok(); // Notification marked as read
         }
         [HttpGet("Get-All-Reviews")]
-        public async Task<IActionResult> GetAllReviews()
+        public async Task<IActionResult> GetAllUserReviews()
         {
             var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userName == null)
@@ -199,7 +308,9 @@ namespace FoodiFavs.Controllers
                 {
                     u.Id,
                     u.UserName,
-
+                    u.ReviewCount,
+                    u.TotalLikes,
+                    u.TotalPoints,
                     Reviews = u.Reviews.Select(review => new
                     {
                         review.Id,
@@ -207,6 +318,7 @@ namespace FoodiFavs.Controllers
                         review.Rating,
                         review.Comment,
                         review.CreatedAt,
+
                     }).ToList()
                 }).FirstOrDefault();
 
