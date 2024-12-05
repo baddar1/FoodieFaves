@@ -266,6 +266,35 @@ namespace FoodiFavs.Controllers
 
             return Ok(sortedRestaurants);
         }
+        [HttpGet("SorteRestaurantByRating")]
+        public async Task<IActionResult> SorteRestaurantByRating()
+        {
+            // Get all reviews for the restaurant
+            var restaurant = await _db.Restaurants.ToListAsync();
+
+            if (restaurant == null || !restaurant.Any())
+            {
+                return NotFound("No reviews found for the given restaurant.");
+            }
+
+
+            var sortedRestaurant = restaurant
+                .OrderByDescending(r => r.Rating)
+                .Select(r => new
+                {
+                    r.Id,
+                    r.Name,
+                    r.Rating,
+                    r.Cuisine,
+                    r.Budget,
+                    r.Location,
+                    r.ImgUrl,
+                    r.Description
+                })
+                .ToList();
+
+            return Ok(sortedRestaurant);
+        }
 
 
     }

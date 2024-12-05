@@ -17,5 +17,6 @@ namespace FF.Models
         
         public string BloggerId { get; set; }
         public User Blogger { get; set; }
+
     }
 }

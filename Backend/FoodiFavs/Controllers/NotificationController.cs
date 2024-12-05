@@ -35,7 +35,7 @@ namespace FoodiFavs.Controllers
             // Retrieve all notifications for the user
             var notifications = await _db.Notifications
                 .Where(n => n.UserId == user.Id)
-                .OrderByDescending(n => n.CreatedAt) // Optional: Order by most recent
+                .OrderByDescending(n => n.CreatedAt) 
                 .Select(n => new
                 {
                     //n.Id,
@@ -51,7 +51,7 @@ namespace FoodiFavs.Controllers
                 return NotFound("No notifications found for the user.");
             }
 
-            return Ok(notifications); // Return the notifications
+            return Ok(notifications); 
         }
 
     }

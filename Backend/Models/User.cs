@@ -26,7 +26,11 @@ namespace FF.Models
         [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }
-
+        public int TotalLikes { get; set; } = 0;
+        public double TopRateReview { get; set; } = 0;
+        public Review TopReview { get; set; }
+        public int ReviewCount { get; set; } = 0;
+        public int TotalPoints { get; set; }
         public ICollection<Points> UserRestaurantPoints { get; set; }
 
         [DisplayName("Phone Number")]
