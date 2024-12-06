@@ -28,7 +28,7 @@ namespace FF.Models
         [Required]
         public string Location { get; set; }
         [Required]
-        public string Cuisine { get; set; }
+        public string Cuisine { get; set; }//array
         [Required]
         public double Budget { get; set; }
         [Required]

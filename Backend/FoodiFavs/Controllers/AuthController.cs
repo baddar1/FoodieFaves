@@ -204,9 +204,6 @@ namespace FoodiFavs.Controllers
 
             return Ok(usersWithPoints);
         }
-
-
-
         [HttpPost("forgotpassword")]
         public async Task<IActionResult> RequestPasswordReset([FromBody] RequestPasswordResetDto model)
         {

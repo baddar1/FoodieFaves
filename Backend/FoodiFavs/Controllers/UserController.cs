@@ -292,7 +292,7 @@ namespace FoodiFavs.Controllers
             return Ok(); // Notification marked as read
         }
         [HttpGet("Get-All-Reviews")]
-        public async Task<IActionResult> GetAllUserReviews()
+        public async Task<IActionResult> GetAllReviews()
         {
             var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userName == null)
@@ -329,6 +329,42 @@ namespace FoodiFavs.Controllers
 
 
         }
+        [HttpGet("Get-All-Users-Reviews")]
+        public async Task<IActionResult> GetAllUsersReviews(string Id)
+        {
+            if (Id==null) 
+            {
+                return BadRequest();
+            }
+            var user = _db.Users.FirstOrDefault(u => u.Id==Id);
+            var user1 = _db.Users
+                .Where(u => u.Id==user.Id)
+                .Select(u => new
+                {
+                    u.Id,
+                    u.UserName,
+                    u.ReviewCount,
+                    u.TotalLikes,
+                    u.TotalPoints,
+                    Reviews = u.Reviews.Select(review => new
+                    {
+                        review.Id,
+                        review.RestaurantNav.Name,
+                        review.Rating,
+                        review.Comment,
+                        review.CreatedAt,
+
+                    }).ToList()
+                }).FirstOrDefault();
+
+            if (user1 == null)
+                return NotFound();
+
+            return Ok(user1);
+
+
+        }
+
 
     }
 }
