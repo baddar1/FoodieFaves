@@ -22,7 +22,7 @@ namespace FoodiFavs.Controllers
         }
         
 
-        [HttpGet("GetNotifications")]
+        [HttpGet("Get-MY-Notifications")]
         public async Task<IActionResult> GetNotifications()
         {
             // Get the currently logged-in user's ID
