@@ -24,7 +24,7 @@ namespace FF.Models
         [ValidateNever]
         public Restaurant Restaurant { get; set; }
 
-        public int AllPoints { get; set; } 
+        public int? AllPoints { get; set; } 
 
         public int PointsForEachRestaurant { get; set; }
         

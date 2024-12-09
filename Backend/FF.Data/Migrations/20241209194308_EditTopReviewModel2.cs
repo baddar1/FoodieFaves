@@ -6,14 +6,14 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FF.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class EditTotalPoints : Migration
+    public partial class EditTopReviewModel2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<int>(
-                name: "TotalPoints",
-                table: "Users",
+                name: "RestaurantId",
+                table: "TopReviewForUsers",
                 type: "int",
                 nullable: false,
                 defaultValue: 0);
@@ -23,92 +23,99 @@ namespace FF.Data.Migrations
                 keyColumn: "Id",
                 keyValue: 1,
                 column: "CreatedAt",
-                value: new DateTime(2024, 12, 5, 1, 5, 13, 212, DateTimeKind.Utc).AddTicks(1664));
+                value: new DateTime(2024, 12, 9, 22, 43, 7, 647, DateTimeKind.Local).AddTicks(2139));
 
             migrationBuilder.UpdateData(
                 table: "Reviews",
                 keyColumn: "Id",
                 keyValue: 2,
                 column: "CreatedAt",
-                value: new DateTime(2024, 12, 5, 1, 5, 13, 212, DateTimeKind.Utc).AddTicks(1677));
+                value: new DateTime(2024, 12, 9, 22, 43, 7, 647, DateTimeKind.Local).AddTicks(2163));
 
             migrationBuilder.UpdateData(
                 table: "Reviews",
                 keyColumn: "Id",
                 keyValue: 3,
                 column: "CreatedAt",
-                value: new DateTime(2024, 12, 5, 1, 5, 13, 212, DateTimeKind.Utc).AddTicks(1675));
+                value: new DateTime(2024, 12, 9, 22, 43, 7, 647, DateTimeKind.Local).AddTicks(2159));
 
             migrationBuilder.UpdateData(
                 table: "Reviews",
                 keyColumn: "Id",
                 keyValue: 4,
                 column: "CreatedAt",
-                value: new DateTime(2024, 12, 5, 1, 5, 13, 212, DateTimeKind.Utc).AddTicks(1679));
+                value: new DateTime(2024, 12, 9, 22, 43, 7, 647, DateTimeKind.Local).AddTicks(2166));
 
             migrationBuilder.UpdateData(
                 table: "Reviews",
                 keyColumn: "Id",
                 keyValue: 5,
                 column: "CreatedAt",
-                value: new DateTime(2024, 12, 5, 1, 5, 13, 212, DateTimeKind.Utc).AddTicks(1681));
+                value: new DateTime(2024, 12, 9, 22, 43, 7, 647, DateTimeKind.Local).AddTicks(2169));
 
-            migrationBuilder.UpdateData(
-                table: "Users",
-                keyColumn: "Id",
-                keyValue: "1",
-                column: "TotalPoints",
-                value: 0);
+            migrationBuilder.CreateIndex(
+                name: "IX_TopReviewForUsers_RestaurantId",
+                table: "TopReviewForUsers",
+                column: "RestaurantId");
 
-            migrationBuilder.UpdateData(
-                table: "Users",
-                keyColumn: "Id",
-                keyValue: "2",
-                column: "TotalPoints",
-                value: 0);
+            migrationBuilder.AddForeignKey(
+                name: "FK_TopReviewForUsers_Restaurants_RestaurantId",
+                table: "TopReviewForUsers",
+                column: "RestaurantId",
+                principalTable: "Restaurants",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_TopReviewForUsers_Restaurants_RestaurantId",
+                table: "TopReviewForUsers");
+
+            migrationBuilder.DropIndex(
+                name: "IX_TopReviewForUsers_RestaurantId",
+                table: "TopReviewForUsers");
+
             migrationBuilder.DropColumn(
-                name: "TotalPoints",
-                table: "Users");
+                name: "RestaurantId",
+                table: "TopReviewForUsers");
 
             migrationBuilder.UpdateData(
                 table: "Reviews",
                 keyColumn: "Id",
                 keyValue: 1,
                 column: "CreatedAt",
-                value: new DateTime(2024, 12, 5, 0, 52, 27, 5, DateTimeKind.Utc).AddTicks(5912));
+                value: new DateTime(2024, 12, 9, 22, 33, 41, 935, DateTimeKind.Local).AddTicks(9243));
 
             migrationBuilder.UpdateData(
                 table: "Reviews",
                 keyColumn: "Id",
                 keyValue: 2,
                 column: "CreatedAt",
-                value: new DateTime(2024, 12, 5, 0, 52, 27, 5, DateTimeKind.Utc).AddTicks(5921));
+                value: new DateTime(2024, 12, 9, 22, 33, 41, 935, DateTimeKind.Local).AddTicks(9278));
 
             migrationBuilder.UpdateData(
                 table: "Reviews",
                 keyColumn: "Id",
                 keyValue: 3,
                 column: "CreatedAt",
-                value: new DateTime(2024, 12, 5, 0, 52, 27, 5, DateTimeKind.Utc).AddTicks(5919));
+                value: new DateTime(2024, 12, 9, 22, 33, 41, 935, DateTimeKind.Local).AddTicks(9275));
 
             migrationBuilder.UpdateData(
                 table: "Reviews",
                 keyColumn: "Id",
                 keyValue: 4,
                 column: "CreatedAt",
-                value: new DateTime(2024, 12, 5, 0, 52, 27, 5, DateTimeKind.Utc).AddTicks(5923));
+                value: new DateTime(2024, 12, 9, 22, 33, 41, 935, DateTimeKind.Local).AddTicks(9281));
 
             migrationBuilder.UpdateData(
                 table: "Reviews",
                 keyColumn: "Id",
                 keyValue: 5,
                 column: "CreatedAt",
-                value: new DateTime(2024, 12, 5, 0, 52, 27, 5, DateTimeKind.Utc).AddTicks(5925));
+                value: new DateTime(2024, 12, 9, 22, 33, 41, 935, DateTimeKind.Local).AddTicks(9288));
         }
     }
 }

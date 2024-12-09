@@ -21,6 +21,7 @@ namespace FF.Data.Access.Data
         public DbSet<Points> Points { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Like> Likes { get; set; }
+        public DbSet<TopReviewForUser>TopReviewForUsers { get; set; }
         public DbSet<FavoriteRestaurants> FavoriteRestaurants { get; set; }
         public DbSet<FavoriteBlogger> FavoriteBloggers { get; set; }
 
@@ -38,6 +39,25 @@ namespace FF.Data.Access.Data
                    .HasMany(u => u.Reviews)
                    .WithOne(r => r.UserNav)
                    .HasForeignKey(r => r.UserId);
+            // Configure relationship between User and TopReviewForUser
+            builder.Entity<TopReviewForUser>()
+                .HasOne(tr => tr.UserNav)
+                .WithMany(u => u.TopReviews)
+                .HasForeignKey(tr => tr.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure relationship between Review and TopReviewForUser
+            builder.Entity<TopReviewForUser>()
+                .HasOne(tr => tr.ReviewNav)
+                .WithMany(r => r.TopReviews)
+                .HasForeignKey(tr => tr.ReviewId)
+                .OnDelete(DeleteBehavior.Restrict);
+            // Relationship: Restaurant -> TopReviewForUser
+            builder.Entity<TopReviewForUser>()
+                .HasOne(tr => tr.RestaurantNav)
+                .WithMany(r => r.TopReviews)
+                .HasForeignKey(tr => tr.RestaurantId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Restaurant>().HasData(
                 new Restaurant
@@ -107,6 +127,7 @@ namespace FF.Data.Access.Data
                       UserId="1",
                       RestaurantId = 3, // Foreign key to Restaurant
                       Rating = 4.1,
+                      CreatedAt=DateTime.Now,
                       Comment = "so Juciyy !!",
                       Likes = 100
                   },
@@ -116,6 +137,7 @@ namespace FF.Data.Access.Data
                     UserId="2",
                     RestaurantId = 1, // Foreign key to Restaurant
                     Rating = 4.5,
+                    CreatedAt=DateTime.Now,
                     Comment = "Nashville Fried Chicken, so perfect !!",
                     Likes = 100
                 },
@@ -125,6 +147,7 @@ namespace FF.Data.Access.Data
                      UserId="2",
                      RestaurantId = 1, // Foreign key to Restaurant
                      Rating = 4.5,
+                     CreatedAt=DateTime.Now,
                      Comment = "Nashville Fried Chicken, so perfect !!",
                      Likes = 105
                  },
@@ -134,6 +157,7 @@ namespace FF.Data.Access.Data
                      UserId="2",
                      RestaurantId = 1, // Foreign key to Restaurant
                      Rating = 4.5,
+                     CreatedAt=DateTime.Now,
                      Comment = "Nashville Fried Chicken, so perfect !!",
                      Likes = 99
                 }
