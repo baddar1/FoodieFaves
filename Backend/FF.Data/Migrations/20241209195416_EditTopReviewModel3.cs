@@ -6,80 +6,95 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FF.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class SeedOneReview2 : Migration
+    public partial class EditTopReviewModel3 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AddColumn<double>(
+                name: "TopRate",
+                table: "TopReviewForUsers",
+                type: "float",
+                nullable: false,
+                defaultValue: 0.0);
+
             migrationBuilder.UpdateData(
                 table: "Reviews",
                 keyColumn: "Id",
                 keyValue: 1,
                 column: "CreatedAt",
-                value: new DateTime(2024, 12, 4, 0, 11, 56, 466, DateTimeKind.Utc).AddTicks(7921));
+                value: new DateTime(2024, 12, 9, 22, 54, 15, 176, DateTimeKind.Local).AddTicks(1329));
 
             migrationBuilder.UpdateData(
                 table: "Reviews",
                 keyColumn: "Id",
                 keyValue: 2,
                 column: "CreatedAt",
-                value: new DateTime(2024, 12, 4, 0, 11, 56, 466, DateTimeKind.Utc).AddTicks(7936));
+                value: new DateTime(2024, 12, 9, 22, 54, 15, 176, DateTimeKind.Local).AddTicks(1370));
 
             migrationBuilder.UpdateData(
                 table: "Reviews",
                 keyColumn: "Id",
                 keyValue: 3,
                 column: "CreatedAt",
-                value: new DateTime(2024, 12, 4, 0, 11, 56, 466, DateTimeKind.Utc).AddTicks(7934));
+                value: new DateTime(2024, 12, 9, 22, 54, 15, 176, DateTimeKind.Local).AddTicks(1366));
 
             migrationBuilder.UpdateData(
                 table: "Reviews",
                 keyColumn: "Id",
                 keyValue: 4,
                 column: "CreatedAt",
-                value: new DateTime(2024, 12, 4, 0, 11, 56, 466, DateTimeKind.Utc).AddTicks(7938));
+                value: new DateTime(2024, 12, 9, 22, 54, 15, 176, DateTimeKind.Local).AddTicks(1373));
 
-            migrationBuilder.InsertData(
+            migrationBuilder.UpdateData(
                 table: "Reviews",
-                columns: new[] { "Id", "AdminId", "Comment", "CreatedAt", "IsReported", "Likes", "NotificationId", "Points", "Rating", "RestaurantId", "UserId" },
-                values: new object[] { 5, null, "Nashville Fried Chicken, so perfect !!", new DateTime(2024, 12, 4, 0, 11, 56, 466, DateTimeKind.Utc).AddTicks(7940), null, 99, null, 0, 4.5, 1, "2" });
+                keyColumn: "Id",
+                keyValue: 5,
+                column: "CreatedAt",
+                value: new DateTime(2024, 12, 9, 22, 54, 15, 176, DateTimeKind.Local).AddTicks(1376));
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DeleteData(
-                table: "Reviews",
-                keyColumn: "Id",
-                keyValue: 5);
+            migrationBuilder.DropColumn(
+                name: "TopRate",
+                table: "TopReviewForUsers");
 
             migrationBuilder.UpdateData(
                 table: "Reviews",
                 keyColumn: "Id",
                 keyValue: 1,
                 column: "CreatedAt",
-                value: new DateTime(2024, 12, 4, 0, 0, 38, 626, DateTimeKind.Utc).AddTicks(4776));
+                value: new DateTime(2024, 12, 9, 22, 43, 7, 647, DateTimeKind.Local).AddTicks(2139));
 
             migrationBuilder.UpdateData(
                 table: "Reviews",
                 keyColumn: "Id",
                 keyValue: 2,
                 column: "CreatedAt",
-                value: new DateTime(2024, 12, 4, 0, 0, 38, 626, DateTimeKind.Utc).AddTicks(4784));
+                value: new DateTime(2024, 12, 9, 22, 43, 7, 647, DateTimeKind.Local).AddTicks(2163));
 
             migrationBuilder.UpdateData(
                 table: "Reviews",
                 keyColumn: "Id",
                 keyValue: 3,
                 column: "CreatedAt",
-                value: new DateTime(2024, 12, 4, 0, 0, 38, 626, DateTimeKind.Utc).AddTicks(4782));
+                value: new DateTime(2024, 12, 9, 22, 43, 7, 647, DateTimeKind.Local).AddTicks(2159));
 
             migrationBuilder.UpdateData(
                 table: "Reviews",
                 keyColumn: "Id",
                 keyValue: 4,
                 column: "CreatedAt",
-                value: new DateTime(2024, 12, 4, 0, 0, 38, 626, DateTimeKind.Utc).AddTicks(4785));
+                value: new DateTime(2024, 12, 9, 22, 43, 7, 647, DateTimeKind.Local).AddTicks(2166));
+
+            migrationBuilder.UpdateData(
+                table: "Reviews",
+                keyColumn: "Id",
+                keyValue: 5,
+                column: "CreatedAt",
+                value: new DateTime(2024, 12, 9, 22, 43, 7, 647, DateTimeKind.Local).AddTicks(2169));
         }
     }
 }

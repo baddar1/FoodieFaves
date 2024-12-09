@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using FF.Models.Dto.RestaurantDto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.InteropServices;
 namespace FoodiFavs.Controllers
 {
     [Route("api/[controller]")]
@@ -36,6 +37,9 @@ namespace FoodiFavs.Controllers
                     r.Budget,
                     r.Location,
                     r.ImgUrl,
+                    r.Open,
+                    r.Close,
+                    r.LiveSite,
                     r.Description
                 })
                 .ToListAsync();
@@ -71,6 +75,9 @@ namespace FoodiFavs.Controllers
                     r.Budget,
                     r.Location,
                     r.ImgUrl,
+                    r.Open,
+                    r.Close,
+                    r.LiveSite,
                     r.Description,
                     Reviews = r.ReviweNav.Select(review => new
                     {
@@ -121,6 +128,10 @@ namespace FoodiFavs.Controllers
                 Cuisine=obj.Cuisine,
                 Budget=obj.Budget,
                 ImgUrl=obj.ImgUrl,
+                LiveSite=obj.LiveSite,
+                Open=obj.Open,
+                Close=obj.Close,
+                Description=obj.Description,
 
             };
 
@@ -172,6 +183,10 @@ namespace FoodiFavs.Controllers
             Restaurant.Email = obj.Email;
             Restaurant.Budget = obj.Budget;
             Restaurant.ImgUrl = obj.ImgUrl;
+            Restaurant.LiveSite=obj.LiveSite;
+            Restaurant.Open=obj.Open;
+            Restaurant.Close=obj.Close;
+            Restaurant.Description=obj.Description;
 
             _db.SaveChanges();
             return NoContent();

@@ -1,6 +1,8 @@
 ﻿using FF.Data.Access.Data;
 using FF.Data.Access.Repository.IRepository;
 using FF.Models;
+using FF.Models.Dto.RestaurantDto;
+using FF.Models.Dto.UserDto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -114,8 +116,8 @@ namespace FoodiFavs.Controllers
                 //return Ok("Removes");
             }
         }
-        [HttpGet("Get-Favorite-Bloggers")]
-        public async Task<IActionResult> GetFavoriteBloggers()
+        [HttpGet("Get-Bloggers")]
+        public async Task<IActionResult> GetBloggers()
         {
             var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = _db.Users.FirstOrDefault(u => u.UserName == userName);
@@ -363,6 +365,27 @@ namespace FoodiFavs.Controllers
             return Ok(user1);
 
 
+        }
+        [HttpGet("Points-info")]
+        public async Task<IActionResult> GetAllUsersPoints()
+        {
+            var usersWithPoints = await _db.Users
+                .Include(u => u.UserRestaurantPoints)  // Include the user-restaurant points association
+                    .ThenInclude(urp => urp.Restaurant) // Then include restaurant details
+                .Select(u => new UserPointsDto
+                {
+                    UserName = u.UserName,
+                    Email = u.Email,
+                    RestaurantPoints = u.UserRestaurantPoints.Select(urp => new RestaurantPointsDto
+                    {
+                        RestaurantId = urp.RestaurantId,
+                        RestaurantName = urp.Restaurant.Name,
+                        Points = urp.PointsForEachRestaurant
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            return Ok(usersWithPoints);
         }
 
 

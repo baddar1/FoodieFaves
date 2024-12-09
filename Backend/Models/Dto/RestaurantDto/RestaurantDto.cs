@@ -30,5 +30,9 @@ namespace FF.Models.Dto.RestaurantDto
         public double Budget { get; set; }
         [Required]
         public string ImgUrl { get; set; }
+        public string? LiveSite { get; set; }
+        public string? Open { get; set; }
+        public string? Close { get; set; }
+        public string? Description { get; set; }
     }
 }

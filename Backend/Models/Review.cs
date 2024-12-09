@@ -22,7 +22,9 @@ namespace FF.Models
         public int? Points { get; set; } = 0;
         public bool? IsReported { get; set; }
    
-        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? CreatedAt { get; set; } = DateTime.Now;
+        public ICollection<TopReviewForUser> TopReviews { get; set; }
+
         //Navigation for the Relationship Many To one Brtween Restaurant and Reviwe
         public int RestaurantId { get; set; }
         [ForeignKey("RestaurantId")]

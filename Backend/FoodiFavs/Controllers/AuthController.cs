@@ -183,27 +183,7 @@ namespace FoodiFavs.Controllers
 
             return Ok(userInfo);
         }
-        [HttpGet("Points-info")]
-        public async Task<IActionResult> GetAllUsersPoints()
-        {
-            var usersWithPoints = await _db.Users
-                .Include(u => u.UserRestaurantPoints)  // Include the user-restaurant points association
-                    .ThenInclude(urp => urp.Restaurant) // Then include restaurant details
-                .Select(u => new UserPointsDto
-                {
-                    UserName = u.UserName,
-                    Email = u.Email,
-                    RestaurantPoints = u.UserRestaurantPoints.Select(urp => new RestaurantPointsDto
-                    {
-                        RestaurantId = urp.RestaurantId,
-                        RestaurantName = urp.Restaurant.Name,
-                        Points = urp.PointsForEachRestaurant
-                    }).ToList()
-                })
-                .ToListAsync();
-
-            return Ok(usersWithPoints);
-        }
+       
         [HttpPost("forgotpassword")]
         public async Task<IActionResult> RequestPasswordReset([FromBody] RequestPasswordResetDto model)
         {

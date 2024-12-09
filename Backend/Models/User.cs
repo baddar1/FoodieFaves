@@ -27,10 +27,10 @@ namespace FF.Models
         [DataType(DataType.Password)]
         public string Password { get; set; }
         public int TotalLikes { get; set; } = 0;
-        public double TopRateReview { get; set; } = 0;
-        public Review TopReview { get; set; }
-        public int ReviewCount { get; set; } = 0;
-        public int TotalPoints { get; set; }
+        public int? ReviewCount { get; set; } = 0;
+        public int? TotalPoints { get; set; } = 0;
+        public double? TopRateReview { get; set; }
+        public ICollection<TopReviewForUser>? TopReviews { get; set; }
         public ICollection<Points> UserRestaurantPoints { get; set; }
 
         [DisplayName("Phone Number")]
