@@ -33,7 +33,12 @@ namespace FF.Models
         public double Budget { get; set; }
         [Required]
         public string ImgUrl { get; set; }
+        public string? LiveSite { get; set; }
+        public string? Open { get; set; }
+        public string? Close { get; set; }
+
         public string? Description { get; set; }
+        public ICollection<TopReviewForUser>? TopReviews { get; set; }
         public ICollection<FavoriteRestaurants>? FavoriteRestaurants { get; set; }
         public ICollection<FavoriteBlogger> FavoriteBloggers { get; set; }
         public ICollection<Points> UserRestaurantPoints { get; set; }

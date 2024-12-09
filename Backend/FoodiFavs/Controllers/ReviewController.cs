@@ -95,16 +95,13 @@ namespace FoodiFavs.Controllers
             user.ReviewCount++;
             user.TotalPoints+=5;
             _db.Reviews.Add(model);
+            await _db.SaveChangesAsync();
 
-            // get the max value for each review for each user (For sorting)
-            if (model.Rating>user.TopRateReview) 
-            {
-                user.TopRateReview = model.Rating;
-                user.TopReview=model;
-            }
+            var TopReview = new TopReviewForUser();
 
             var userRestaurantPoints = await _db.Points
             .FirstOrDefaultAsync(p => p.UserId == user.Id && p.RestaurantId == obj.RestaurantId);
+            userRestaurantPoints.AllPoints=user.TotalPoints;
             var notification = new Notification
             {
                 UserId = user.Id,
@@ -122,10 +119,18 @@ namespace FoodiFavs.Controllers
                     RestaurantId = obj.RestaurantId,
                     PointsForEachRestaurant = 5,
                 };
-               
+
+                TopReview.UserId=user.Id;
+                TopReview.ReviewId=model.Id;
+                user.TopRateReview=model.Rating;
+                TopReview.TopRate=model.Rating;
+                TopReview.RestaurantId=restaurant.Id;
+                
                 notification.Message = $"{user.UserName} Congratulations on posting your first review on {restaurant.Name} You've earned 5 points for your contribution!";
-                   
+                
+                _db.TopReviewForUsers.Add(TopReview);
                 _db.Points.Add(userRestaurantPoints);
+                await _db.SaveChangesAsync();
             }
             else
             {
@@ -134,7 +139,22 @@ namespace FoodiFavs.Controllers
                 
                 notification.Message = $"{user.UserName} You've earned 5 points for your contribution y!";
 
+                //To find top review for each user
+                var existingTopReview = _db.TopReviewForUsers.FirstOrDefault(tr => tr.UserId == user.Id);
+
+                if (model.Rating>user.TopRateReview) 
+                {
+                    existingTopReview.ReviewId = model.Id;
+                    existingTopReview.RestaurantId = restaurant.Id;
+                    existingTopReview.TopRate = model.Rating;
+
+                    user.TopRateReview = model.Rating;
+
+                    _db.TopReviewForUsers.Update(existingTopReview);
+                }
             }
+
+            
             _db.Notifications.Add(notification);
             await _db.SaveChangesAsync();
 
