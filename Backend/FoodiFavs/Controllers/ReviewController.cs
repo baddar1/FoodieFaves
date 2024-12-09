@@ -175,7 +175,7 @@ namespace FoodiFavs.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpDelete("DeleteReview-ById ")]
-        [Authorize(Roles ="Admin")]
+        //[Authorize(Roles ="Admin")]
         public IActionResult DeleteReview(int Id)
         {
            

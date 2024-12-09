@@ -98,7 +98,7 @@ namespace FoodiFavs.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [Authorize(Roles ="Admin")]
+        //[Authorize(Roles = "Admin")]
         public ActionResult AddRestaurant([FromBody] RestaurantDto obj)
         {
 
@@ -132,7 +132,7 @@ namespace FoodiFavs.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpDelete("DeleteRestaurant-ById ")]
-        [Authorize(Roles ="Admin")]
+        //[Authorize(Roles ="Admin")]
         public IActionResult DeleteRestaurant(int Id)
         {
 
@@ -154,7 +154,7 @@ namespace FoodiFavs.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPut("UpadteRestaurant-ById")]
-        [Authorize(Roles ="Admin")]
+        //[Authorize(Roles ="Admin")]
         public IActionResult UpdateRestaurant(int Id,[FromBody]UpdateRestaurantDto obj)
         {
   
