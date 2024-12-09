@@ -251,48 +251,7 @@ namespace FoodiFavs.Controllers
 
             return Ok("Favorite restaurant removed successfully." );
         }
-        [HttpGet("Get-Notifications")]
-        public async Task<IActionResult> GetNotifications()
-        {
-            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userName == null)
-            {
-                return Unauthorized(); // Return 401 if user is not logged in
-            }
-
-            var user = _db.Users.FirstOrDefault(u => u.UserName == userName);
-            if (user == null)
-            {
-                return BadRequest("User not found");
-            }
-
-            // Fetch unread notifications for the user
-            var notifications = _db.Notifications
-                                   .Where(n => n.UserId == user.Id && !n.IsRead)
-                                   .OrderByDescending(n => n.CreatedAt)
-                                   .Select(n => new { n.Message, n.CreatedAt })
-                                   .ToList();
-
-            if (notifications.Count == 0)
-            {
-                return Ok("No new notifications.");
-            }
-
-            return Ok(notifications);
-        }
         [HttpPost("Mark-Notification-As-Read")]
-        public async Task<IActionResult> MarkNotificationAsRead(int notificationId)
-        {
-            var notification = _db.Notifications.FirstOrDefault(n => n.Id == notificationId);
-            if (notification == null)
-            {
-                return NotFound("Notification not found.");
-            }
-
-            notification.IsRead = true;
-            _db.SaveChanges();
-            return Ok(); // Notification marked as read
-        }
         [HttpGet("Get-All-Reviews")]
         public async Task<IActionResult> GetAllReviews()
         {
