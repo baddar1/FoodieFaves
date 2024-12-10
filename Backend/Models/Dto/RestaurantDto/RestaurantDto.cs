@@ -25,11 +25,10 @@ namespace FF.Models.Dto.RestaurantDto
         [Required]
         public string Location { get; set; }
         [Required]
-        public string Cuisine { get; set; }
+        public List<string> Cuisine { get; set; } 
         [Required]
         public double Budget { get; set; }
         [Required]
-        public string ImgUrl { get; set; }
         public string? LiveSite { get; set; }
         public string? Open { get; set; }
         public string? Close { get; set; }

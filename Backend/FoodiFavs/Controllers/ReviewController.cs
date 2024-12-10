@@ -94,6 +94,7 @@ namespace FoodiFavs.Controllers
             //To count reviews number for each user
             user.ReviewCount++;
             user.TotalPoints+=5;
+            restaurant.ReviewCount++;
             _db.Reviews.Add(model);
             await _db.SaveChangesAsync();
 
@@ -101,7 +102,7 @@ namespace FoodiFavs.Controllers
 
             var userRestaurantPoints = await _db.Points
             .FirstOrDefaultAsync(p => p.UserId == user.Id && p.RestaurantId == obj.RestaurantId);
-            userRestaurantPoints.AllPoints=user.TotalPoints;
+           
             var notification = new Notification
             {
                 UserId = user.Id,
@@ -127,7 +128,8 @@ namespace FoodiFavs.Controllers
                 TopReview.RestaurantId=restaurant.Id;
                 
                 notification.Message = $"{user.UserName} Congratulations on posting your first review on {restaurant.Name} You've earned 5 points for your contribution!";
-                
+                notification.ReviewId=model.Id;
+                notification.RestaurantId=model.RestaurantId;
                 _db.TopReviewForUsers.Add(TopReview);
                 _db.Points.Add(userRestaurantPoints);
                 await _db.SaveChangesAsync();
@@ -138,7 +140,8 @@ namespace FoodiFavs.Controllers
                 userRestaurantPoints.PointsForEachRestaurant += 5;
                 
                 notification.Message = $"{user.UserName} You've earned 5 points for your contribution y!";
-
+                notification.ReviewId=model.Id;
+                notification.RestaurantId=model.RestaurantId;
                 //To find top review for each user
                 var existingTopReview = _db.TopReviewForUsers.FirstOrDefault(tr => tr.UserId == user.Id);
 
@@ -153,8 +156,8 @@ namespace FoodiFavs.Controllers
                     _db.TopReviewForUsers.Update(existingTopReview);
                 }
             }
+            userRestaurantPoints.AllPoints=user.TotalPoints;
 
-            
             _db.Notifications.Add(notification);
             await _db.SaveChangesAsync();
 
@@ -183,6 +186,8 @@ namespace FoodiFavs.Controllers
                     Message = $"{user.UserName}, your favorite blogger, has written a new review for {restaurant.Name}!",
                     CreatedAt = DateTime.Now,
                     IsRead = false,
+                    ReviewId=model.Id,
+                    RestaurantId=restaurant.Id,
                     NotificationType="Review"
                 };
                 _db.Notifications.Add(notificationReview);
@@ -245,6 +250,7 @@ namespace FoodiFavs.Controllers
             var user = _db.Users.FirstOrDefault(u => u.UserName == userId);
             var existingLike = _db.Likes.FirstOrDefault((l => l.UserId == user.Id && l.ReviewId == ReviewId));
             var Review = _db.Reviews.FirstOrDefault(r => r.Id == ReviewId);
+            var reviewer = _db.Users.FirstOrDefault(u => u.Id == Review.UserId);
             if (existingLike == null)
             {
                 var Like = new Like
@@ -253,8 +259,15 @@ namespace FoodiFavs.Controllers
                     ReviewId = ReviewId,
                     CreatedAt = DateTime.UtcNow,
                 };
+
                 Review.Likes++;
-                user.TotalLikes++;
+
+               
+                if (reviewer != null)
+                {
+                    reviewer.TotalLikes++;
+                }
+
                 _db.Likes.Add(Like);
                 if (Review.UserId != user.Id) 
                 {
@@ -275,6 +288,7 @@ namespace FoodiFavs.Controllers
             {
                 _db.Likes.Remove(existingLike);
                 Review.Likes--;
+                reviewer.TotalLikes--;
                 user.TotalLikes--;
                 var notification = _db.Notifications
                 .FirstOrDefault(n => n.UserId == Review.UserId
@@ -308,6 +322,7 @@ namespace FoodiFavs.Controllers
                     Message = $"Review by {review.UserId} has been reported for offensive content.",
                     CreatedAt = DateTime.Now,
                     IsRead = false,
+                    ReviewId=review.Id,
                     NotificationType="Report"
                 };
                 _db.Notifications.Add(notification);
