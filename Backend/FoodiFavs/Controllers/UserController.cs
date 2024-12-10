@@ -36,6 +36,15 @@ namespace FoodiFavs.Controllers
             var restaurant = _db.Restaurants.FirstOrDefault(r => r.Id == RestaurantId);
 
             var FavoriteRes = _db.FavoriteRestaurants.FirstOrDefault(f => f.RestaurantId == RestaurantId && f.UserId == user.Id);
+            var notification = new Notification
+            {
+                UserId = user.Id,
+                Message ="",
+                CreatedAt = DateTime.Now,
+                IsRead = false,
+                NotificationType="Favorite Restaurant",
+                RestaurantId=restaurant.Id,
+            };
             if (FavoriteRes is null)
             {
                 var Favorite = new FavoriteRestaurants
@@ -44,19 +53,61 @@ namespace FoodiFavs.Controllers
                     UserId = user.Id
                 };
                 _db.FavoriteRestaurants.Add(Favorite);
+                notification.Message=$"{restaurant.Name} is add to your favorite restaurants list";
+                notification.NotificationType="Favorite Restaurant";
+                _db.Notifications.Add(notification);
                 _db.SaveChanges();
-                return Ok();
+                return Ok(notification.Message);
             }
             else
             {
                 _db.FavoriteRestaurants.Remove(FavoriteRes);
+                notification.Message=$"{restaurant.Name} is removed from favorite restaurants list";
+                notification.NotificationType="Favorite Restaurant";
+                _db.Notifications.Add(notification);
                 _db.SaveChanges();
-                return Ok();
+                return Ok(notification.Message);
             }
 
         }
-        [HttpPost("Add-Favorite-Blogger")]
+        [HttpGet("Get-Favorite-Restaurants")]
+        public async Task<IActionResult> GetFavoriteRestaurants()
+        {
+            
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier); 
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.UserName == userName);
 
+            if (user == null)
+            {
+                return Unauthorized("User is not authenticated.");
+            }
+
+            // Fetch the favorite restaurants 
+            var favoriteRestaurants = await _db.FavoriteRestaurants
+                .Where(fr => fr.UserId == user.Id) 
+                .Include(fr => fr.Restaurant) 
+                .Select(fr => new
+                {
+                    fr.Restaurant.Name,    
+                    fr.Restaurant.Open,
+                    fr.Restaurant.Close,
+                    fr.Restaurant.Description,
+                    fr.Restaurant.ImgUrl,     
+                    fr.Restaurant.Location, 
+                    fr.Restaurant.Cuisine,    
+                    fr.Restaurant.Rating      
+                })
+                .ToListAsync();
+
+            if (!favoriteRestaurants.Any())
+            {
+                return NotFound("No favorite restaurants found for the user.");
+            }
+
+            return Ok(favoriteRestaurants); // Return the favorite restaurants list
+        }
+
+        [HttpPost("Add-Favorite-Blogger")]
         public async Task<IActionResult> AddFavoriteBlogger(string BloggerId)
         {
           
@@ -92,6 +143,7 @@ namespace FoodiFavs.Controllers
                     Message = $"{user.UserName} has added you as a favorite blogger!",
                     CreatedAt = DateTime.Now,
                     IsRead = false,
+                    BloggertId = BloggerId,
                     NotificationType="Favorite Blogger"
                 };
 
@@ -116,86 +168,99 @@ namespace FoodiFavs.Controllers
                 //return Ok("Removes");
             }
         }
-        [HttpGet("Get-Bloggers")]
-        public async Task<IActionResult> GetBloggers()
+        [HttpGet("Get-Favorite-Bloggers")]
+        public async Task<IActionResult> GetFavoriteBloggers()
         {
-            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = _db.Users.FirstOrDefault(u => u.UserName == userName);
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier); // Get the user's ID or name from the claims
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.UserName == userName);
 
-            if (string.IsNullOrEmpty(user.Id))
+            if (user == null)
             {
                 return Unauthorized("User is not authenticated.");
             }
 
-           
             var favoriteBloggers = await _db.FavoriteBloggers
-                .Where(fb => fb.UserId == user.Id)
+                .Where(fb => fb.UserId == user.Id) 
                 .Include(fb => fb.Blogger) 
                 .Select(fb => new
                 {
-                    BloggerId = user.Id,
-                    BloggerName = fb.Blogger.UserName,
-                    TopReview = fb.Blogger.Reviews
-                .OrderByDescending(r => r.Rating) 
-                .Select(r => new
-                {
-                    Restaurant = new
-                    {
-                        r.RestaurantId,
-                        r.RestaurantNav.ImgUrl,
-                        r.RestaurantNav.Name,
-                    },
-                    ReviewId = r.Id,
-                    r.Rating,
-                    r.Comment,
-                    r.Likes,
-                    r.CreatedAt
-                })
-                .FirstOrDefault()
+                    fb.Blogger.Id,
+                    fb.Blogger.UserName,
+                    fb.Blogger.ReviewCount,
+                    fb.Blogger.ImgUrl,
+                    ReviewInfo = fb.Blogger.TopReviews
+                        .OrderByDescending(tr => tr.TopRate)
+                        .Select(tr => new
+                        {
+                            tr.ReviewId,
+                            tr.ReviewNav.Comment,
+                            tr.ReviewNav.Rating,
+                            tr.ReviewNav.CreatedAt
+                        }).FirstOrDefault(),
+
+                    // Select the restaurant info
+                    RestaurantInfo = fb.Blogger.TopReviews
+                        .OrderByDescending(tr => tr.TopRate)
+                        .Select(tr => new
+                        {
+                            tr.RestaurantId,
+                            tr.RestaurantNav.Name,
+                            tr.RestaurantNav.Cuisine,
+                            tr.RestaurantNav.Location,
+                            tr.RestaurantNav.ImgUrl
+                        }).FirstOrDefault()
                 })
                 .ToListAsync();
 
             if (!favoriteBloggers.Any())
             {
-                return NotFound("No favorite bloggers found for the user.");
+                return NotFound("No favorite bloggers found.");
             }
 
-            return Ok(favoriteBloggers);
+            return Ok(favoriteBloggers); // Return the favorite bloggers list
         }
-        [HttpGet("Get-Favorite-Restaurants")]
-        public async Task<IActionResult> GetFavoriteRestaurants()
+
+        [HttpGet("Get-Top-Bloggers")]
+        public async Task<IActionResult> TopReviewers()
         {
-            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userName == null)
-            {
-                return Unauthorized(); // Return 401 if user is not logged inuser
-            }
-            var user = _db.Users.FirstOrDefault(u => u.UserName == userName);
-            if (user == null) {
-                return BadRequest("User not found");
-            }
-            
-            var FavoriteList = _db.FavoriteRestaurants.
-                Where(c => c.UserId == user.Id).
-                Include(f => f.Restaurant).
-                Select(r=> new
-                    { 
-                       r.Restaurant.ImgUrl,
-                       r.Restaurant.Name,
-                       r.Restaurant.Cuisine,
-                       r.Restaurant.Rating,
-                       r.Restaurant.Description
+            // Fetch top 10 
+            var topReviewers = await _db.Users
+                .OrderByDescending(u => u.ReviewCount) 
+                //.Where(u=>u.ReviewCount>15)
+                .Take(10) // Get top 10 users
+                // Select the User info
+                .Select(u => new
+                {
+                    u.Id,
+                    u.UserName,
+                    u.ReviewCount,
+                    u.ImgUrl,
+                    // Select the review info
+                    ReviewInfo = u.TopReviews
+                        .OrderByDescending(tr => tr.TopRate)
+                        .Select(tr => new
+                        {
+                            tr.ReviewId,
+                            tr.ReviewNav.Comment,
+                            tr.ReviewNav.Rating,
+                            tr.ReviewNav.CreatedAt
+                        }).FirstOrDefault(),
 
-                    }
-                
-                )
-                .ToList();
-            if (FavoriteList.Count == 0) {
-                return Ok("The favorite List is empty !!");
-            }
+                    // Select the restaurant info
+                    RestaurantInfo = u.TopReviews
+                        .OrderByDescending(tr => tr.TopRate)
+                        .Select(tr => new
+                        {
+                            tr.RestaurantId,
+                            tr.RestaurantNav.Name,
+                            tr.RestaurantNav.Cuisine,
+                            tr.RestaurantNav.Location,
+                            tr.RestaurantNav.ImgUrl
+                        }).FirstOrDefault()
+                })
+                .ToListAsync(); 
 
-
-            return Ok(FavoriteList);
+            return Ok(topReviewers);
         }
         [HttpDelete("Delete-Favorite-Blogger")]
         public async Task<IActionResult> DeleteFavoriteBlogger(string bloggerId)
@@ -251,54 +316,16 @@ namespace FoodiFavs.Controllers
 
             return Ok("Favorite restaurant removed successfully." );
         }
-        [HttpPost("Mark-Notification-As-Read")]
-        [HttpGet("Get-All-Reviews")]
-        public async Task<IActionResult> GetAllReviews()
+        [HttpGet("Get-All-User-Reviews")]
+        public async Task<IActionResult> GetAllUserReviews()
         {
             var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userName == null)
-            {
-                return Unauthorized(); // Return 401 if user is not logged in
-            }
             var user = _db.Users.FirstOrDefault(u => u.UserName == userName);
-          
-
-            var user1 = _db.Users
-                .Where(u => u.Id==user.Id)
-                .Select(u=> new 
-                {
-                    u.Id,
-                    u.UserName,
-                    u.ReviewCount,
-                    u.TotalLikes,
-                    u.TotalPoints,
-                    Reviews = u.Reviews.Select(review => new
-                    {
-                        review.Id,
-                        review.RestaurantNav.Name,
-                        review.Rating,
-                        review.Comment,
-                        review.CreatedAt,
-
-                    }).ToList()
-                }).FirstOrDefault();
-
-            if (user1 == null)
-                return NotFound();
-
-            return Ok(user1);
-
-
-        }
-        [HttpGet("Get-All-Users-Reviews")]
-        public async Task<IActionResult> GetAllUsersReviews(string Id)
-        {
-            if (Id==null) 
+            if (user.Id==null) 
             {
                 return BadRequest();
             }
-            var user = _db.Users.FirstOrDefault(u => u.Id==Id);
-            var user1 = _db.Users
+             var userReviews = _db.Users
                 .Where(u => u.Id==user.Id)
                 .Select(u => new
                 {
@@ -314,38 +341,62 @@ namespace FoodiFavs.Controllers
                         review.Rating,
                         review.Comment,
                         review.CreatedAt,
+                        review.Likes,
 
                     }).ToList()
                 }).FirstOrDefault();
 
-            if (user1 == null)
+            if (userReviews == null)
                 return NotFound();
 
-            return Ok(user1);
+            return Ok(userReviews);
 
 
         }
-        [HttpGet("Points-info")]
-        public async Task<IActionResult> GetAllUsersPoints()
+        [HttpPost("upload-Users-images")]
+        public async Task<IActionResult> UploadUserImage(IFormFile file)
         {
-            var usersWithPoints = await _db.Users
-                .Include(u => u.UserRestaurantPoints)  // Include the user-restaurant points association
-                    .ThenInclude(urp => urp.Restaurant) // Then include restaurant details
-                .Select(u => new UserPointsDto
-                {
-                    UserName = u.UserName,
-                    Email = u.Email,
-                    RestaurantPoints = u.UserRestaurantPoints.Select(urp => new RestaurantPointsDto
-                    {
-                        RestaurantId = urp.RestaurantId,
-                        RestaurantName = urp.Restaurant.Name,
-                        Points = urp.PointsForEachRestaurant
-                    }).ToList()
-                })
-                .ToListAsync();
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("No file uploaded.");
+            }
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userName == null)
+            {
+                return Unauthorized(); // Return 401 if user is not logged in
+            }
+            var user = _db.Users.FirstOrDefault(u => u.UserName == userName);
 
-            return Ok(usersWithPoints);
+            //unique file name 
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+
+            //Define the folder name
+            var UserFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "UsersImgs", $"User.{user.UserName}");
+
+            //Check if the directory exists if not create it
+            if (!Directory.Exists(UserFolder))
+            {
+                Directory.CreateDirectory(UserFolder);
+            }
+
+            //save the image
+            var filePath = Path.Combine(UserFolder, fileName);
+
+            //Save the image to folder
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+            var relativePath = $"/UsersImgs/User.{user.UserName}/{fileName}";
+      
+            user.ImgUrl = relativePath; 
+        
+
+            await _db.SaveChangesAsync();
+
+            return Ok(new { ImageUrl = relativePath });
         }
+
 
 
     }

@@ -67,7 +67,7 @@ namespace FF.Data.Access.Data
                     phoneNumber = "0799902599",
                     Email = string.Empty,
                     Location = "Abdllah Ghosheh Street",
-                    Cuisine = "Fried Chicken",
+                    Cuisine = ["Fried Chicken","shawarmah"],
                     Budget = 3.5,
                     ImgUrl = "Photo",
 
@@ -80,7 +80,7 @@ namespace FF.Data.Access.Data
                     phoneNumber = "0790067776",
                     Email = string.Empty,
                     Location = "Abdoun Circle",
-                    Cuisine = "Burger",
+                    Cuisine = ["Burger", "shawarmah"],
                     Budget = 4,
                     ImgUrl = "Photo",
                 },
@@ -91,7 +91,7 @@ namespace FF.Data.Access.Data
                     phoneNumber = "0799902599",
                     Email = string.Empty,
                     Location = "Jubiha",
-                    Cuisine = "shawerma",
+                    Cuisine = ["shawarmah"],
                     Budget = 4.1,
                     ImgUrl = "Photo",
 
@@ -104,7 +104,7 @@ namespace FF.Data.Access.Data
                      phoneNumber = "0799902599",
                      Email = string.Empty,
                      Location = "Jubiha",
-                     Cuisine = "shawerma",
+                     Cuisine = ["meet","chiken"],
                      Budget = 2,
                      ImgUrl = "Photo",
 
@@ -168,12 +168,14 @@ namespace FF.Data.Access.Data
                {
                    Id = "1",
                    UserName = "YazeedNada",
+                   ImgUrl="Y!",
                    Password= "Yazeed12.",
                    Email = "YazeedNada@gmail.com"
                },
                new User
                {
                    Id = "2",
+                   ImgUrl="M!",
                    UserName = "Mohammadbaddar",
                    Password ="Mohd12.",
                    Email = "Mohammadbaddar@gmail.com"

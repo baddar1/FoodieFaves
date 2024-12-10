@@ -4,6 +4,7 @@ using FF.Data.Access.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FF.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241209233748_EditFavoriteBlogger2")]
+    partial class EditFavoriteBlogger2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -102,14 +105,14 @@ namespace FF.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("BloggertId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
+
+                    b.Property<int?>("LikeId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Message")
                         .IsRequired()
@@ -130,6 +133,8 @@ namespace FF.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LikeId");
 
                     b.HasIndex("ReviewId");
 
@@ -241,9 +246,6 @@ namespace FF.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AdditionalRestaurantImages")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("AdminId")
                         .HasColumnType("nvarchar(450)");
 
@@ -275,9 +277,6 @@ namespace FF.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LogoImg")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -287,9 +286,6 @@ namespace FF.Data.Migrations
 
                     b.Property<double>("Rating")
                         .HasColumnType("float");
-
-                    b.Property<int?>("ReviewCount")
-                        .HasColumnType("int");
 
                     b.Property<string>("phoneNumber")
                         .IsRequired()
@@ -307,52 +303,48 @@ namespace FF.Data.Migrations
                         {
                             Id = 1,
                             Budget = 3.5,
-                            Cuisine = "[\"Fried Chicken\",\"shawarmah\"]",
+                            Cuisine = "Fried Chicken",
                             Email = "",
                             ImgUrl = "Photo",
                             Location = "Abdllah Ghosheh Street",
                             Name = "Nashville",
                             Rating = 0.0,
-                            ReviewCount = 0,
                             phoneNumber = "0799902599"
                         },
                         new
                         {
                             Id = 2,
                             Budget = 4.0,
-                            Cuisine = "[\"Burger\",\"shawarmah\"]",
+                            Cuisine = "Burger",
                             Email = "",
                             ImgUrl = "Photo",
                             Location = "Abdoun Circle",
                             Name = "X Burger",
                             Rating = 0.0,
-                            ReviewCount = 0,
                             phoneNumber = "0790067776"
                         },
                         new
                         {
                             Id = 3,
                             Budget = 4.0999999999999996,
-                            Cuisine = "[\"shawarmah\"]",
+                            Cuisine = "shawerma",
                             Email = "",
                             ImgUrl = "Photo",
                             Location = "Jubiha",
                             Name = "saj",
                             Rating = 0.0,
-                            ReviewCount = 0,
                             phoneNumber = "0799902599"
                         },
                         new
                         {
                             Id = 4,
                             Budget = 2.0,
-                            Cuisine = "[\"meet\",\"chiken\"]",
+                            Cuisine = "shawerma",
                             Email = "",
                             ImgUrl = "Photo",
                             Location = "Jubiha",
                             Name = "Reem",
                             Rating = 0.0,
-                            ReviewCount = 0,
                             phoneNumber = "0799902599"
                         });
                 });
@@ -413,7 +405,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 1,
                             Comment = "Nashville Fried Chicken, so so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 10, 20, 16, 2, 2, DateTimeKind.Local).AddTicks(9592),
+                            CreatedAt = new DateTime(2024, 12, 10, 2, 37, 47, 180, DateTimeKind.Local).AddTicks(8577),
                             Likes = 100,
                             Points = 0,
                             Rating = 4.7000000000000002,
@@ -424,7 +416,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 3,
                             Comment = "so Juciyy !!",
-                            CreatedAt = new DateTime(2024, 12, 10, 20, 16, 2, 2, DateTimeKind.Local).AddTicks(9616),
+                            CreatedAt = new DateTime(2024, 12, 10, 2, 37, 47, 180, DateTimeKind.Local).AddTicks(8619),
                             Likes = 100,
                             Points = 0,
                             Rating = 4.0999999999999996,
@@ -435,7 +427,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 2,
                             Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 10, 20, 16, 2, 2, DateTimeKind.Local).AddTicks(9620),
+                            CreatedAt = new DateTime(2024, 12, 10, 2, 37, 47, 180, DateTimeKind.Local).AddTicks(8623),
                             Likes = 100,
                             Points = 0,
                             Rating = 4.5,
@@ -446,7 +438,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 4,
                             Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 10, 20, 16, 2, 2, DateTimeKind.Local).AddTicks(9623),
+                            CreatedAt = new DateTime(2024, 12, 10, 2, 37, 47, 180, DateTimeKind.Local).AddTicks(8626),
                             Likes = 105,
                             Points = 0,
                             Rating = 4.5,
@@ -457,7 +449,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 5,
                             Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 10, 20, 16, 2, 2, DateTimeKind.Local).AddTicks(9626),
+                            CreatedAt = new DateTime(2024, 12, 10, 2, 37, 47, 180, DateTimeKind.Local).AddTicks(8629),
                             Likes = 99,
                             Points = 0,
                             Rating = 4.5,
@@ -840,6 +832,10 @@ namespace FF.Data.Migrations
 
             modelBuilder.Entity("FF.Models.Notification", b =>
                 {
+                    b.HasOne("FF.Models.Like", "LikeNav")
+                        .WithMany()
+                        .HasForeignKey("LikeId");
+
                     b.HasOne("FF.Models.Review", "ReviewNav")
                         .WithMany()
                         .HasForeignKey("ReviewId");
@@ -849,6 +845,8 @@ namespace FF.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("LikeNav");
 
                     b.Navigation("ReviewNav");
 

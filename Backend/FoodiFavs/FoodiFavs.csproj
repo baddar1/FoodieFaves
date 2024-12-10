@@ -32,4 +32,8 @@
     <ProjectReference Include="..\Models\FF.Models.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
 </Project>

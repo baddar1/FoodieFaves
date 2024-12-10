@@ -4,6 +4,7 @@ using FF.Data.Access.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FF.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241210113118_maketheCuisineList")]
+    partial class maketheCuisineList
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -241,9 +244,6 @@ namespace FF.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AdditionalRestaurantImages")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("AdminId")
                         .HasColumnType("nvarchar(450)");
 
@@ -275,9 +275,6 @@ namespace FF.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LogoImg")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -287,9 +284,6 @@ namespace FF.Data.Migrations
 
                     b.Property<double>("Rating")
                         .HasColumnType("float");
-
-                    b.Property<int?>("ReviewCount")
-                        .HasColumnType("int");
 
                     b.Property<string>("phoneNumber")
                         .IsRequired()
@@ -313,7 +307,6 @@ namespace FF.Data.Migrations
                             Location = "Abdllah Ghosheh Street",
                             Name = "Nashville",
                             Rating = 0.0,
-                            ReviewCount = 0,
                             phoneNumber = "0799902599"
                         },
                         new
@@ -326,20 +319,18 @@ namespace FF.Data.Migrations
                             Location = "Abdoun Circle",
                             Name = "X Burger",
                             Rating = 0.0,
-                            ReviewCount = 0,
                             phoneNumber = "0790067776"
                         },
                         new
                         {
                             Id = 3,
                             Budget = 4.0999999999999996,
-                            Cuisine = "[\"shawarmah\"]",
+                            Cuisine = "[\"shawerma\"]",
                             Email = "",
                             ImgUrl = "Photo",
                             Location = "Jubiha",
                             Name = "saj",
                             Rating = 0.0,
-                            ReviewCount = 0,
                             phoneNumber = "0799902599"
                         },
                         new
@@ -352,7 +343,6 @@ namespace FF.Data.Migrations
                             Location = "Jubiha",
                             Name = "Reem",
                             Rating = 0.0,
-                            ReviewCount = 0,
                             phoneNumber = "0799902599"
                         });
                 });
@@ -413,7 +403,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 1,
                             Comment = "Nashville Fried Chicken, so so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 10, 20, 16, 2, 2, DateTimeKind.Local).AddTicks(9592),
+                            CreatedAt = new DateTime(2024, 12, 10, 14, 31, 17, 449, DateTimeKind.Local).AddTicks(8795),
                             Likes = 100,
                             Points = 0,
                             Rating = 4.7000000000000002,
@@ -424,7 +414,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 3,
                             Comment = "so Juciyy !!",
-                            CreatedAt = new DateTime(2024, 12, 10, 20, 16, 2, 2, DateTimeKind.Local).AddTicks(9616),
+                            CreatedAt = new DateTime(2024, 12, 10, 14, 31, 17, 449, DateTimeKind.Local).AddTicks(8818),
                             Likes = 100,
                             Points = 0,
                             Rating = 4.0999999999999996,
@@ -435,7 +425,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 2,
                             Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 10, 20, 16, 2, 2, DateTimeKind.Local).AddTicks(9620),
+                            CreatedAt = new DateTime(2024, 12, 10, 14, 31, 17, 449, DateTimeKind.Local).AddTicks(8821),
                             Likes = 100,
                             Points = 0,
                             Rating = 4.5,
@@ -446,7 +436,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 4,
                             Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 10, 20, 16, 2, 2, DateTimeKind.Local).AddTicks(9623),
+                            CreatedAt = new DateTime(2024, 12, 10, 14, 31, 17, 449, DateTimeKind.Local).AddTicks(8824),
                             Likes = 105,
                             Points = 0,
                             Rating = 4.5,
@@ -457,7 +447,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 5,
                             Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 10, 20, 16, 2, 2, DateTimeKind.Local).AddTicks(9626),
+                            CreatedAt = new DateTime(2024, 12, 10, 14, 31, 17, 449, DateTimeKind.Local).AddTicks(8826),
                             Likes = 99,
                             Points = 0,
                             Rating = 4.5,
