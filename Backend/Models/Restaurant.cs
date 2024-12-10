@@ -28,14 +28,17 @@ namespace FF.Models
         [Required]
         public string Location { get; set; }
         [Required]
-        public string Cuisine { get; set; }//array
+        public List<string> Cuisine { get; set; }//array
         [Required]
         public double Budget { get; set; }
         [Required]
-        public string ImgUrl { get; set; }
+        public string? ImgUrl { get; set; }
+        public string? LogoImg { get; set; }
+        public List<string>? AdditionalRestaurantImages { get; set; }
         public string? LiveSite { get; set; }
         public string? Open { get; set; }
         public string? Close { get; set; }
+        public int? ReviewCount { get; set; } = 0;
 
         public string? Description { get; set; }
         public ICollection<TopReviewForUser>? TopReviews { get; set; }

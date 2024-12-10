@@ -4,6 +4,7 @@ using FF.Data.Access.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FF.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241209232318_EditFavoriteBlogger")]
+    partial class EditFavoriteBlogger
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,7 +32,7 @@ namespace FF.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Admins", (string)null);
+                    b.ToTable("Admins");
                 });
 
             modelBuilder.Entity("FF.Models.FavoriteBlogger", b =>
@@ -49,7 +52,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("RestaurantId");
 
-                    b.ToTable("FavoriteBloggers", (string)null);
+                    b.ToTable("FavoriteBloggers");
                 });
 
             modelBuilder.Entity("FF.Models.FavoriteRestaurants", b =>
@@ -64,7 +67,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("RestaurantId");
 
-                    b.ToTable("FavoriteRestaurants", (string)null);
+                    b.ToTable("FavoriteRestaurants");
                 });
 
             modelBuilder.Entity("FF.Models.Like", b =>
@@ -91,7 +94,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Likes", (string)null);
+                    b.ToTable("Likes");
                 });
 
             modelBuilder.Entity("FF.Models.Notification", b =>
@@ -102,14 +105,14 @@ namespace FF.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("BloggertId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
+
+                    b.Property<int?>("LikeId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Message")
                         .IsRequired()
@@ -131,11 +134,13 @@ namespace FF.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("LikeId");
+
                     b.HasIndex("ReviewId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notifications", (string)null);
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("FF.Models.Order", b =>
@@ -161,7 +166,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("RestaurantId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("FF.Models.PendingUser", b =>
@@ -200,7 +205,7 @@ namespace FF.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PendingUsers", (string)null);
+                    b.ToTable("PendingUsers");
                 });
 
             modelBuilder.Entity("FF.Models.Points", b =>
@@ -230,7 +235,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Points", (string)null);
+                    b.ToTable("Points");
                 });
 
             modelBuilder.Entity("FF.Models.Restaurant", b =>
@@ -240,9 +245,6 @@ namespace FF.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AdditionalRestaurantImages")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AdminId")
                         .HasColumnType("nvarchar(450)");
@@ -275,9 +277,6 @@ namespace FF.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LogoImg")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -288,9 +287,6 @@ namespace FF.Data.Migrations
                     b.Property<double>("Rating")
                         .HasColumnType("float");
 
-                    b.Property<int?>("ReviewCount")
-                        .HasColumnType("int");
-
                     b.Property<string>("phoneNumber")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -300,59 +296,55 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("AdminId");
 
-                    b.ToTable("Restaurants", (string)null);
+                    b.ToTable("Restaurants");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
                             Budget = 3.5,
-                            Cuisine = "[\"Fried Chicken\",\"shawarmah\"]",
+                            Cuisine = "Fried Chicken",
                             Email = "",
                             ImgUrl = "Photo",
                             Location = "Abdllah Ghosheh Street",
                             Name = "Nashville",
                             Rating = 0.0,
-                            ReviewCount = 0,
                             phoneNumber = "0799902599"
                         },
                         new
                         {
                             Id = 2,
                             Budget = 4.0,
-                            Cuisine = "[\"Burger\",\"shawarmah\"]",
+                            Cuisine = "Burger",
                             Email = "",
                             ImgUrl = "Photo",
                             Location = "Abdoun Circle",
                             Name = "X Burger",
                             Rating = 0.0,
-                            ReviewCount = 0,
                             phoneNumber = "0790067776"
                         },
                         new
                         {
                             Id = 3,
                             Budget = 4.0999999999999996,
-                            Cuisine = "[\"shawarmah\"]",
+                            Cuisine = "shawerma",
                             Email = "",
                             ImgUrl = "Photo",
                             Location = "Jubiha",
                             Name = "saj",
                             Rating = 0.0,
-                            ReviewCount = 0,
                             phoneNumber = "0799902599"
                         },
                         new
                         {
                             Id = 4,
                             Budget = 2.0,
-                            Cuisine = "[\"meet\",\"chiken\"]",
+                            Cuisine = "shawerma",
                             Email = "",
                             ImgUrl = "Photo",
                             Location = "Jubiha",
                             Name = "Reem",
                             Rating = 0.0,
-                            ReviewCount = 0,
                             phoneNumber = "0799902599"
                         });
                 });
@@ -406,14 +398,14 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Reviews", (string)null);
+                    b.ToTable("Reviews");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
                             Comment = "Nashville Fried Chicken, so so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 10, 20, 16, 2, 2, DateTimeKind.Local).AddTicks(9592),
+                            CreatedAt = new DateTime(2024, 12, 10, 2, 23, 17, 632, DateTimeKind.Local).AddTicks(1968),
                             Likes = 100,
                             Points = 0,
                             Rating = 4.7000000000000002,
@@ -424,7 +416,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 3,
                             Comment = "so Juciyy !!",
-                            CreatedAt = new DateTime(2024, 12, 10, 20, 16, 2, 2, DateTimeKind.Local).AddTicks(9616),
+                            CreatedAt = new DateTime(2024, 12, 10, 2, 23, 17, 632, DateTimeKind.Local).AddTicks(1990),
                             Likes = 100,
                             Points = 0,
                             Rating = 4.0999999999999996,
@@ -435,7 +427,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 2,
                             Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 10, 20, 16, 2, 2, DateTimeKind.Local).AddTicks(9620),
+                            CreatedAt = new DateTime(2024, 12, 10, 2, 23, 17, 632, DateTimeKind.Local).AddTicks(1993),
                             Likes = 100,
                             Points = 0,
                             Rating = 4.5,
@@ -446,7 +438,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 4,
                             Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 10, 20, 16, 2, 2, DateTimeKind.Local).AddTicks(9623),
+                            CreatedAt = new DateTime(2024, 12, 10, 2, 23, 17, 632, DateTimeKind.Local).AddTicks(1996),
                             Likes = 105,
                             Points = 0,
                             Rating = 4.5,
@@ -457,7 +449,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 5,
                             Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 10, 20, 16, 2, 2, DateTimeKind.Local).AddTicks(9626),
+                            CreatedAt = new DateTime(2024, 12, 10, 2, 23, 17, 632, DateTimeKind.Local).AddTicks(1999),
                             Likes = 99,
                             Points = 0,
                             Rating = 4.5,
@@ -539,6 +531,12 @@ namespace FF.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("FavoriteBloggerBloggerId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FavoriteBloggerUserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int>("RestaurantId")
                         .HasColumnType("int");
 
@@ -560,7 +558,9 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TopReviewForUsers", (string)null);
+                    b.HasIndex("FavoriteBloggerUserId", "FavoriteBloggerBloggerId");
+
+                    b.ToTable("TopReviewForUsers");
                 });
 
             modelBuilder.Entity("FF.Models.User", b =>
@@ -617,7 +617,7 @@ namespace FF.Data.Migrations
                         .IsUnique()
                         .HasFilter("[ApplicationUserId] IS NOT NULL");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
 
                     b.HasData(
                         new
@@ -840,6 +840,10 @@ namespace FF.Data.Migrations
 
             modelBuilder.Entity("FF.Models.Notification", b =>
                 {
+                    b.HasOne("FF.Models.Like", "LikeNav")
+                        .WithMany()
+                        .HasForeignKey("LikeId");
+
                     b.HasOne("FF.Models.Review", "ReviewNav")
                         .WithMany()
                         .HasForeignKey("ReviewId");
@@ -849,6 +853,8 @@ namespace FF.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("LikeNav");
 
                     b.Navigation("ReviewNav");
 
@@ -945,6 +951,10 @@ namespace FF.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("FF.Models.FavoriteBlogger", null)
+                        .WithMany("TopReviews")
+                        .HasForeignKey("FavoriteBloggerUserId", "FavoriteBloggerBloggerId");
+
                     b.Navigation("RestaurantNav");
 
                     b.Navigation("ReviewNav");
@@ -1025,6 +1035,11 @@ namespace FF.Data.Migrations
                     b.Navigation("ManageReviews");
 
                     b.Navigation("ManageUsers");
+                });
+
+            modelBuilder.Entity("FF.Models.FavoriteBlogger", b =>
+                {
+                    b.Navigation("TopReviews");
                 });
 
             modelBuilder.Entity("FF.Models.Restaurant", b =>

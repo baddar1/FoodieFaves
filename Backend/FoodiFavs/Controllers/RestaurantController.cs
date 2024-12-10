@@ -32,8 +32,10 @@ namespace FoodiFavs.Controllers
                 {
                     r.Id,
                     r.Name,
+                    r.phoneNumber,
                     r.Rating,
                     r.Cuisine,
+                    r.ReviewCount,
                     r.Budget,
                     r.Location,
                     r.ImgUrl,
@@ -70,8 +72,10 @@ namespace FoodiFavs.Controllers
                 {
                     r.Id,
                     r.Name,
+                    r.phoneNumber,
                     r.Rating,
-                    r.Cuisine,
+                    r.ReviewCount,
+                    Cuisine = r.Cuisine ?? new List<string>(),
                     r.Budget,
                     r.Location,
                     r.ImgUrl,
@@ -105,7 +109,7 @@ namespace FoodiFavs.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles ="Admin")]
         public ActionResult AddRestaurant([FromBody] RestaurantDto obj)
         {
 
@@ -127,7 +131,6 @@ namespace FoodiFavs.Controllers
                 Location=obj.Location,
                 Cuisine=obj.Cuisine,
                 Budget=obj.Budget,
-                ImgUrl=obj.ImgUrl,
                 LiveSite=obj.LiveSite,
                 Open=obj.Open,
                 Close=obj.Close,
@@ -211,12 +214,17 @@ namespace FoodiFavs.Controllers
                 {
                     r.Id,
                     r.Name,
-                    r.Description,
+                    r.phoneNumber,
                     r.Rating,
-                    r.Location,
                     r.Cuisine,
+                    r.ReviewCount,
                     r.Budget,
-                    r.ImgUrl
+                    r.Location,
+                    r.ImgUrl,
+                    r.Open,
+                    r.Close,
+                    r.LiveSite,
+                    r.Description
                 })
                 .ToListAsync();
 
@@ -227,27 +235,28 @@ namespace FoodiFavs.Controllers
 
             return Ok(results);
         }
-        [HttpGet("Filter-By-Cuisine")]
-        public async Task<IActionResult> Filter([FromQuery] string? cuisine, [FromQuery] string? budget)
+        [HttpGet("Filter-By-Cuisine-Budget")]
+        public async Task<IActionResult> Filter([FromQuery] List<string>? cuisine, [FromQuery] string? budget)
         {
-            // Build the query to filter restaurants
             var query = _db.Restaurants.AsQueryable();
 
-            // Filter restaurants based on cuisine (if provided)
-            if (!string.IsNullOrEmpty(cuisine))
+            // Filter restaurants based on cuisine
+            if (cuisine != null && cuisine.Count() > 0)
             {
-                query = query.Where(r => r.Cuisine.ToLower() == cuisine.ToLower());
+                query = query.Where(r => r.Cuisine.Any(c => cuisine.Contains(c)));
             }
-            // Filter restaurants based on budget (if provided)
+
+
+            // Filter restaurants based on budget
             if (!string.IsNullOrEmpty(budget))
             {
                 switch (budget.ToLower())
                 {
                     case "low":
-                        query = query.Where(r => r.Budget >= 1 || r.Budget < 5); // Assuming "low" budget is between 1 and 5
+                        query = query.Where(r => r.Budget >= 1 && r.Budget < 5); // Assuming "low" budget is between 1 and 5
                         break;
                     case "mid":
-                        query = query.Where(r => r.Budget >= 5 && r.Budget <10 ); // "mid" budget is between 5 and 10
+                        query = query.Where(r => r.Budget >= 5 && r.Budget < 10); // "mid" budget is between 5 and 10
                         break;
                     case "high":
                         query = query.Where(r => r.Budget >= 10); // "high" budget is 10 and above
@@ -257,7 +266,7 @@ namespace FoodiFavs.Controllers
                 }
             }
 
-            // Sorting restaurants by Budget first and then by Cuisine
+            // Bring data into memory for sorting
             var sortedRestaurants = await query
                 .Select(r => new
                 {
@@ -269,9 +278,22 @@ namespace FoodiFavs.Controllers
                     r.Location,
                     r.ImgUrl
                 })
-                .OrderBy(r => r.Budget)      // Sort by Budget (ascending)
-                .ThenBy(r => r.Cuisine)      // Then sort by Cuisine (alphabetical order)
                 .ToListAsync();
+
+            // Filter and sort data
+            if (cuisine != null && cuisine.Count() > 0)
+            {
+                sortedRestaurants = sortedRestaurants
+                    .Where(r => r.Cuisine.Any(c => cuisine.Contains(c)))
+                    .ToList();
+            }
+
+
+            // Sorting restaurants by Budget and then by Cuisine 
+            sortedRestaurants = sortedRestaurants
+                .OrderBy(r => r.Budget)
+                .ThenBy(r => string.Join(", ", r.Cuisine))
+                .ToList();
 
             // If no results found
             if (!sortedRestaurants.Any())
@@ -299,17 +321,83 @@ namespace FoodiFavs.Controllers
                 {
                     r.Id,
                     r.Name,
+                    r.phoneNumber,
                     r.Rating,
                     r.Cuisine,
+                    r.ReviewCount,
                     r.Budget,
                     r.Location,
                     r.ImgUrl,
+                    r.Open,
+                    r.Close,
+                    r.LiveSite,
                     r.Description
                 })
                 .ToList();
 
             return Ok(sortedRestaurant);
         }
+        [HttpPost("upload-Restaurant-images")]
+        public async Task<IActionResult> UploadRestaurantImage(int restaurantId, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("No file uploaded.");
+            }
+
+            //Check if the restaurant exists
+            var restaurant = await _db.Restaurants.FindAsync(restaurantId);
+            if (restaurant == null)
+            {
+                return NotFound("Restaurant not found.");
+            }
+
+            //unique file name 
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+
+            //Define the folder name
+            var restaurantFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "RestaurantImgs", $"Restaurant_{restaurantId}");
+
+            //Check if the directory exists if not create it
+            if (!Directory.Exists(restaurantFolder))
+            {
+                Directory.CreateDirectory(restaurantFolder);
+            }
+
+            //save the image
+            var filePath = Path.Combine(restaurantFolder, fileName);
+
+            //Save the image to folder
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+            var relativePath = $"/RestaurantImgs/Restaurant_{restaurantId}/{fileName}";
+            if (string.IsNullOrEmpty(restaurant.ImgUrl))
+            {
+                restaurant.ImgUrl = relativePath; // Add this as the main image if it's the first one
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(restaurant.LogoImg))
+                {
+                    restaurant.LogoImg = relativePath;
+
+                }
+                else
+                {
+
+                    restaurant.AdditionalRestaurantImages = restaurant.AdditionalRestaurantImages ?? new List<string>();
+                    restaurant.AdditionalRestaurantImages.Add(relativePath);
+                }
+            }
+
+            await _db.SaveChangesAsync();
+
+            return Ok(new { ImageUrl = relativePath });
+        }
+
+
 
 
     }

@@ -27,10 +27,10 @@ namespace FF.Models
         [ForeignKey("RestaurantId")]
         [ValidateNever]
         Restaurant FavRestaurant { get; set; }
-        public int? LikeId { get; set; }
-        [ForeignKey("LikeId")]
+        public string? BloggertId { get; set; }
+        [ForeignKey("BloggerId")]
         [ValidateNever]
-        public Like? LikeNav { get; set; }
+        User FavBlogger { get; set; }
         public string NotificationType { get; set; }
         public string Message { get; set; } // Add message to store notification content
         public DateTime CreatedAt { get; set; } // When the notification was created

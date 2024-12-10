@@ -4,6 +4,7 @@ using FF.Data.Access.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FF.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241210113511_AddReviewCountToRes")]
+    partial class AddReviewCountToRes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,7 +32,7 @@ namespace FF.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Admins", (string)null);
+                    b.ToTable("Admins");
                 });
 
             modelBuilder.Entity("FF.Models.FavoriteBlogger", b =>
@@ -49,7 +52,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("RestaurantId");
 
-                    b.ToTable("FavoriteBloggers", (string)null);
+                    b.ToTable("FavoriteBloggers");
                 });
 
             modelBuilder.Entity("FF.Models.FavoriteRestaurants", b =>
@@ -64,7 +67,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("RestaurantId");
 
-                    b.ToTable("FavoriteRestaurants", (string)null);
+                    b.ToTable("FavoriteRestaurants");
                 });
 
             modelBuilder.Entity("FF.Models.Like", b =>
@@ -91,7 +94,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Likes", (string)null);
+                    b.ToTable("Likes");
                 });
 
             modelBuilder.Entity("FF.Models.Notification", b =>
@@ -135,7 +138,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notifications", (string)null);
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("FF.Models.Order", b =>
@@ -161,7 +164,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("RestaurantId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("FF.Models.PendingUser", b =>
@@ -200,7 +203,7 @@ namespace FF.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PendingUsers", (string)null);
+                    b.ToTable("PendingUsers");
                 });
 
             modelBuilder.Entity("FF.Models.Points", b =>
@@ -230,7 +233,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Points", (string)null);
+                    b.ToTable("Points");
                 });
 
             modelBuilder.Entity("FF.Models.Restaurant", b =>
@@ -240,9 +243,6 @@ namespace FF.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AdditionalRestaurantImages")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AdminId")
                         .HasColumnType("nvarchar(450)");
@@ -275,9 +275,6 @@ namespace FF.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LogoImg")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -288,7 +285,7 @@ namespace FF.Data.Migrations
                     b.Property<double>("Rating")
                         .HasColumnType("float");
 
-                    b.Property<int?>("ReviewCount")
+                    b.Property<int>("ReviewCount")
                         .HasColumnType("int");
 
                     b.Property<string>("phoneNumber")
@@ -300,7 +297,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("AdminId");
 
-                    b.ToTable("Restaurants", (string)null);
+                    b.ToTable("Restaurants");
 
                     b.HasData(
                         new
@@ -333,7 +330,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 3,
                             Budget = 4.0999999999999996,
-                            Cuisine = "[\"shawarmah\"]",
+                            Cuisine = "[\"shawerma\"]",
                             Email = "",
                             ImgUrl = "Photo",
                             Location = "Jubiha",
@@ -406,14 +403,14 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Reviews", (string)null);
+                    b.ToTable("Reviews");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
                             Comment = "Nashville Fried Chicken, so so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 10, 20, 16, 2, 2, DateTimeKind.Local).AddTicks(9592),
+                            CreatedAt = new DateTime(2024, 12, 10, 14, 35, 10, 754, DateTimeKind.Local).AddTicks(4271),
                             Likes = 100,
                             Points = 0,
                             Rating = 4.7000000000000002,
@@ -424,7 +421,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 3,
                             Comment = "so Juciyy !!",
-                            CreatedAt = new DateTime(2024, 12, 10, 20, 16, 2, 2, DateTimeKind.Local).AddTicks(9616),
+                            CreatedAt = new DateTime(2024, 12, 10, 14, 35, 10, 754, DateTimeKind.Local).AddTicks(4290),
                             Likes = 100,
                             Points = 0,
                             Rating = 4.0999999999999996,
@@ -435,7 +432,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 2,
                             Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 10, 20, 16, 2, 2, DateTimeKind.Local).AddTicks(9620),
+                            CreatedAt = new DateTime(2024, 12, 10, 14, 35, 10, 754, DateTimeKind.Local).AddTicks(4293),
                             Likes = 100,
                             Points = 0,
                             Rating = 4.5,
@@ -446,7 +443,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 4,
                             Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 10, 20, 16, 2, 2, DateTimeKind.Local).AddTicks(9623),
+                            CreatedAt = new DateTime(2024, 12, 10, 14, 35, 10, 754, DateTimeKind.Local).AddTicks(4342),
                             Likes = 105,
                             Points = 0,
                             Rating = 4.5,
@@ -457,7 +454,7 @@ namespace FF.Data.Migrations
                         {
                             Id = 5,
                             Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 10, 20, 16, 2, 2, DateTimeKind.Local).AddTicks(9626),
+                            CreatedAt = new DateTime(2024, 12, 10, 14, 35, 10, 754, DateTimeKind.Local).AddTicks(4345),
                             Likes = 99,
                             Points = 0,
                             Rating = 4.5,
@@ -560,7 +557,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TopReviewForUsers", (string)null);
+                    b.ToTable("TopReviewForUsers");
                 });
 
             modelBuilder.Entity("FF.Models.User", b =>
@@ -617,7 +614,7 @@ namespace FF.Data.Migrations
                         .IsUnique()
                         .HasFilter("[ApplicationUserId] IS NOT NULL");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
 
                     b.HasData(
                         new
