@@ -4,6 +4,7 @@ using FF.Data.Access.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FF.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241211155712_EditOrderModel")]
+    partial class EditOrderModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -160,19 +163,9 @@ namespace FF.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ReviewId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("RestaurantId");
-
-                    b.HasIndex("ReviewId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Orders");
                 });
@@ -395,9 +388,6 @@ namespace FF.Data.Migrations
                     b.Property<int?>("NotificationId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("OrderId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("Points")
                         .HasColumnType("int");
 
@@ -417,13 +407,68 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("NotificationId");
 
-                    b.HasIndex("OrderId");
-
                     b.HasIndex("RestaurantId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("Reviews");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Comment = "Nashville Fried Chicken, so so perfect !!",
+                            CreatedAt = new DateTime(2024, 12, 11, 18, 57, 10, 973, DateTimeKind.Local).AddTicks(6762),
+                            Likes = 100,
+                            Points = 0,
+                            Rating = 4.7000000000000002,
+                            RestaurantId = 1,
+                            UserId = "1"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Comment = "so Juciyy !!",
+                            CreatedAt = new DateTime(2024, 12, 11, 18, 57, 10, 973, DateTimeKind.Local).AddTicks(6784),
+                            Likes = 100,
+                            Points = 0,
+                            Rating = 4.0999999999999996,
+                            RestaurantId = 3,
+                            UserId = "1"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Comment = "Nashville Fried Chicken, so perfect !!",
+                            CreatedAt = new DateTime(2024, 12, 11, 18, 57, 10, 973, DateTimeKind.Local).AddTicks(6788),
+                            Likes = 100,
+                            Points = 0,
+                            Rating = 4.5,
+                            RestaurantId = 1,
+                            UserId = "2"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Comment = "Nashville Fried Chicken, so perfect !!",
+                            CreatedAt = new DateTime(2024, 12, 11, 18, 57, 10, 973, DateTimeKind.Local).AddTicks(6792),
+                            Likes = 105,
+                            Points = 0,
+                            Rating = 4.5,
+                            RestaurantId = 1,
+                            UserId = "2"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Comment = "Nashville Fried Chicken, so perfect !!",
+                            CreatedAt = new DateTime(2024, 12, 11, 18, 57, 10, 973, DateTimeKind.Local).AddTicks(6794),
+                            Likes = 99,
+                            Points = 0,
+                            Rating = 4.5,
+                            RestaurantId = 1,
+                            UserId = "2"
+                        });
                 });
 
             modelBuilder.Entity("FF.Models.Secuirty.ApplicationUser", b =>
@@ -578,6 +623,30 @@ namespace FF.Data.Migrations
                         .HasFilter("[ApplicationUserId] IS NOT NULL");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "1",
+                            Email = "YazeedNada@gmail.com",
+                            ImgUrl = "Y!",
+                            Password = "Yazeed12.",
+                            ReviewCount = 0,
+                            TotalLikes = 0,
+                            TotalPoints = 0,
+                            UserName = "YazeedNada"
+                        },
+                        new
+                        {
+                            Id = "2",
+                            Email = "Mohammadbaddar@gmail.com",
+                            ImgUrl = "M!",
+                            Password = "Mohd12.",
+                            ReviewCount = 0,
+                            TotalLikes = 0,
+                            TotalPoints = 0,
+                            UserName = "Mohammadbaddar"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -799,19 +868,7 @@ namespace FF.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FF.Models.Review", "ReviewNav")
-                        .WithMany()
-                        .HasForeignKey("ReviewId");
-
-                    b.HasOne("FF.Models.User", "UserNav")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
                     b.Navigation("Restaurant");
-
-                    b.Navigation("ReviewNav");
-
-                    b.Navigation("UserNav");
                 });
 
             modelBuilder.Entity("FF.Models.Points", b =>
@@ -852,10 +909,6 @@ namespace FF.Data.Migrations
                         .WithMany()
                         .HasForeignKey("NotificationId");
 
-                    b.HasOne("FF.Models.Order", "OrderNav")
-                        .WithMany()
-                        .HasForeignKey("OrderId");
-
                     b.HasOne("FF.Models.Restaurant", "RestaurantNav")
                         .WithMany("ReviweNav")
                         .HasForeignKey("RestaurantId")
@@ -871,8 +924,6 @@ namespace FF.Data.Migrations
                     b.Navigation("AdminNav");
 
                     b.Navigation("NotificationNav");
-
-                    b.Navigation("OrderNav");
 
                     b.Navigation("RestaurantNav");
 

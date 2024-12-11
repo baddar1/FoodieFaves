@@ -19,7 +19,7 @@ using FF.Data.Helper;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
- builder.Services.Configure<IdentityOptions>(options =>
+builder.Services.Configure<IdentityOptions>(options =>
 {
     options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultEmailProvider; // Ensure this is set
     options.User.RequireUniqueEmail = true; // Optional, based on your requirements
