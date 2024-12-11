@@ -4,6 +4,7 @@ using FF.Data.Access.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FF.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241211162323_removeSeedEntity")]
+    partial class removeSeedEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -160,17 +163,12 @@ namespace FF.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ReviewId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RestaurantId");
-
-                    b.HasIndex("ReviewId");
 
                     b.HasIndex("UserId");
 
@@ -799,17 +797,11 @@ namespace FF.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FF.Models.Review", "ReviewNav")
-                        .WithMany()
-                        .HasForeignKey("ReviewId");
-
                     b.HasOne("FF.Models.User", "UserNav")
                         .WithMany()
                         .HasForeignKey("UserId");
 
                     b.Navigation("Restaurant");
-
-                    b.Navigation("ReviewNav");
 
                     b.Navigation("UserNav");
                 });
@@ -853,7 +845,7 @@ namespace FF.Data.Migrations
                         .HasForeignKey("NotificationId");
 
                     b.HasOne("FF.Models.Order", "OrderNav")
-                        .WithMany()
+                        .WithMany("ReviewId")
                         .HasForeignKey("OrderId");
 
                     b.HasOne("FF.Models.Restaurant", "RestaurantNav")
@@ -979,6 +971,11 @@ namespace FF.Data.Migrations
                     b.Navigation("ManageReviews");
 
                     b.Navigation("ManageUsers");
+                });
+
+            modelBuilder.Entity("FF.Models.Order", b =>
+                {
+                    b.Navigation("ReviewId");
                 });
 
             modelBuilder.Entity("FF.Models.Restaurant", b =>

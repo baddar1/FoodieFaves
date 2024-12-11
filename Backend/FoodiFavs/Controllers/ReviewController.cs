@@ -58,7 +58,37 @@ namespace FoodiFavs.Controllers
             }
 
         }
+        [HttpPost("ValidateReviewCode")]
+        [Authorize]
+        public IActionResult ValidateReviewCode([FromBody] string reviewCode)
+        {
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userName == null)
+            {
+                return Unauthorized(); // Return 401 if user is not logged in
+            }
+            var user = _db.Users.FirstOrDefault(u => u.UserName == userName);
 
+            if (string.IsNullOrWhiteSpace(reviewCode))
+            {
+                return BadRequest("Review code is required.");
+            }
+
+            var order = _db.Orders.FirstOrDefault(o => o.ReviewCode == reviewCode);
+            if (order == null)
+            {
+                return NotFound("Invalid review code.");
+            }
+            var restaurantId = order.RestaurantId;
+            var CodeUsed = _db.Orders.Any(o => o.Id==order.Id && o.IsUsed==true);
+            if (CodeUsed)
+            {
+                return BadRequest("This review code has already been used.");
+            }
+            order.UserId=user.Id;
+            _db.SaveChanges();
+            return Ok($"{restaurantId}");
+        }
         [HttpPost("Add-Review")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -85,18 +115,39 @@ namespace FoodiFavs.Controllers
             var user = _db.Users.FirstOrDefault(u => u.UserName == userName);
             Review model = new()
             {
+                
                 Rating=obj.Rating,
                 Comment=obj.Comment,
                 UserId=user.Id,
                 RestaurantId=obj.RestaurantId,
             };
 
-            //To count reviews number for each user
-            user.ReviewCount++;
-            user.TotalPoints+=5;
-            restaurant.ReviewCount++;
+            
             _db.Reviews.Add(model);
             await _db.SaveChangesAsync();
+
+            var order = _db.Orders.FirstOrDefault(o => o.UserId == user.Id && o.RestaurantId == restaurant.Id && o.IsUsed == false);
+
+            if (order!=null)
+            {
+                order.ReviewId=model.Id;
+                order.IsUsed=true;
+                model.OrderId=order.Id;
+
+                //To count reviews number for each user
+                user.ReviewCount++;
+                user.TotalPoints+=5;
+                restaurant.ReviewCount++;
+
+                await _db.SaveChangesAsync();
+            }
+            else
+            {
+                _db.Reviews.Remove(model);
+                await _db.SaveChangesAsync();
+                return NotFound("The review code Is already used");
+            }
+            
 
             var TopReview = new TopReviewForUser();
 
@@ -111,6 +162,9 @@ namespace FoodiFavs.Controllers
                 IsRead = false,
                 NotificationType="Points"
             };
+            model.NotificationId=notification.Id;
+            await _db.SaveChangesAsync();
+
             if (userRestaurantPoints == null)
             {
                 // If no points exist, create a new record for the user-restaurant pair
@@ -171,13 +225,13 @@ namespace FoodiFavs.Controllers
             _db.Restaurants.Update(restaurant);
             await _db.SaveChangesAsync();
 
-            // Find all the Users whose following the blogger 
+            //Find all the Users whose following the blogger 
             var followers = _db.FavoriteBloggers
                .Where(f => f.BloggerId == user.Id) //Make suer that we search in the same blogger
-               .Select(f => f.UserId) // Get the followers Id
+               .Select(f => f.UserId) //Get the followers Id
                .ToList();
 
-            // Loob to notify to all Followers
+            //Loob to notify to all Followers
             foreach (var followerId in followers)
             {
                 var notificationReview = new Notification
