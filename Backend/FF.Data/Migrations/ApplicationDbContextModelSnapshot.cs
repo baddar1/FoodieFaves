@@ -146,6 +146,9 @@ namespace FF.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
                     b.Property<int>("RestaurantId")
                         .HasColumnType("int");
 
@@ -157,11 +160,17 @@ namespace FF.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("ReviewId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("RestaurantId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("FF.Models.PendingUser", b =>
@@ -382,6 +391,9 @@ namespace FF.Data.Migrations
                     b.Property<int?>("NotificationId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("Points")
                         .HasColumnType("int");
 
@@ -401,11 +413,13 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("NotificationId");
 
+                    b.HasIndex("OrderId");
+
                     b.HasIndex("RestaurantId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Reviews", (string)null);
+                    b.ToTable("Reviews");
 
                     b.HasData(
                         new
@@ -616,7 +630,7 @@ namespace FF.Data.Migrations
                         .IsUnique()
                         .HasFilter("[ApplicationUserId] IS NOT NULL");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
 
                     b.HasData(
                         new
@@ -862,7 +876,19 @@ namespace FF.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("FF.Models.Review", "ReviewNav")
+                        .WithMany()
+                        .HasForeignKey("ReviewId");
+
+                    b.HasOne("FF.Models.User", "UserNav")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
                     b.Navigation("Restaurant");
+
+                    b.Navigation("ReviewNav");
+
+                    b.Navigation("UserNav");
                 });
 
             modelBuilder.Entity("FF.Models.Points", b =>
@@ -903,6 +929,10 @@ namespace FF.Data.Migrations
                         .WithMany()
                         .HasForeignKey("NotificationId");
 
+                    b.HasOne("FF.Models.Order", "OrderNav")
+                        .WithMany()
+                        .HasForeignKey("OrderId");
+
                     b.HasOne("FF.Models.Restaurant", "RestaurantNav")
                         .WithMany("ReviweNav")
                         .HasForeignKey("RestaurantId")
@@ -918,6 +948,8 @@ namespace FF.Data.Migrations
                     b.Navigation("AdminNav");
 
                     b.Navigation("NotificationNav");
+
+                    b.Navigation("OrderNav");
 
                     b.Navigation("RestaurantNav");
 
