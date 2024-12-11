@@ -109,7 +109,7 @@ namespace FoodiFavs.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [Authorize(Roles ="Admin")]
+        //[Authorize(Roles ="Admin")]
         public ActionResult AddRestaurant([FromBody] RestaurantDto obj)
         {
 
