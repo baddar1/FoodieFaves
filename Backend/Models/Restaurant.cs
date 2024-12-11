@@ -31,7 +31,6 @@ namespace FF.Models
         public List<string> Cuisine { get; set; }//array
         [Required]
         public double Budget { get; set; }
-        [Required]
         public string? ImgUrl { get; set; }
         public string? LogoImg { get; set; }
         public List<string>? AdditionalRestaurantImages { get; set; }
