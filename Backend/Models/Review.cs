@@ -42,7 +42,11 @@ namespace FF.Models
         [ForeignKey("NotificationId")]
         [ValidateNever]
         public Notification? NotificationNav { get; set; }
-
+        //Adding Relationship One To One Between order and Reviwe
+        public int? OrderId { get; set; }
+        [ForeignKey("OrderId")]
+        [ValidateNever]
+        public Order? OrderNav { get; set; }
         public string? AdminId { get; set; }
         [ForeignKey("AdminId")]
         [ValidateNever]

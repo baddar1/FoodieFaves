@@ -15,6 +15,7 @@ using System.Text;
 using System.Net;
 using FF.Models.Dto.UserDto;
 using FF.Models.Dto.RestaurantDto;
+using Microsoft.AspNetCore.Authentication.Google;
 
 namespace FoodiFavs.Controllers
 {
@@ -57,15 +58,21 @@ namespace FoodiFavs.Controllers
 
             if (!ModelState.IsValid)
             {
+
                 return BadRequest(ModelState);
             }
+
+
             var result = await _authService.RegisterAsync(registerModel);
-           
-            if (result.IsAuthenticated == false)
+
+
+            if (!result.IsAuthenticated)
             {
+
                 return BadRequest(result.Message);
             }
-            
+
+
             return Ok(result);
         }
         [HttpGet("confirm-email")]
@@ -251,6 +258,7 @@ namespace FoodiFavs.Controllers
 
             return Ok(new { message = "Logged out successfully." });
         }
+        
 
     }
 }
