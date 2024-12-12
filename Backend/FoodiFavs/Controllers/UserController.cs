@@ -204,7 +204,7 @@ namespace FoodiFavs.Controllers
             // Fetch top 10 
             var topReviewers = await _db.Users
                 .OrderByDescending(u => u.ReviewCount) 
-                //.Where(u=>u.ReviewCount>15)
+                .Where(u=>u.ReviewCount>10)
                 .Take(10) // Get top 10 users
                 // Select the User info
                 .Select(u => new
@@ -221,7 +221,8 @@ namespace FoodiFavs.Controllers
                             tr.ReviewId,
                             tr.ReviewNav.Comment,
                             tr.ReviewNav.Rating,
-                            tr.ReviewNav.CreatedAt
+                            tr.ReviewNav.CreatedAt,
+                            tr.ReviewNav.Likes
                         }).FirstOrDefault(),
 
                     // Select the restaurant info
