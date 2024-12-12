@@ -98,7 +98,7 @@ namespace FoodiFavs.Controllers
         {
             if (obj == null)
             {
-                return BadRequest(obj);
+                return BadRequest("Bad input");
             }
 
             var restaurant = await _db.Restaurants.FirstOrDefaultAsync(r => r.Id == obj.RestaurantId);
@@ -161,8 +161,9 @@ namespace FoodiFavs.Controllers
                 CreatedAt = DateTime.Now,
                 IsRead = false,
                 NotificationType="Points"
+
             };
-            model.NotificationId=notification.Id;
+            
             await _db.SaveChangesAsync();
 
             if (userRestaurantPoints == null)
@@ -206,23 +207,21 @@ namespace FoodiFavs.Controllers
                     existingTopReview.TopRate = model.Rating;
 
                     user.TopRateReview = model.Rating;
+                    await _db.SaveChangesAsync();
 
-                    _db.TopReviewForUsers.Update(existingTopReview);
                 }
             }
             userRestaurantPoints.AllPoints=user.TotalPoints;
-
+            
             _db.Notifications.Add(notification);
             await _db.SaveChangesAsync();
-
+ 
             var allRatings = await _db.Reviews
              .Where(r => r.RestaurantId == obj.RestaurantId)
              .Select(r => r.Rating)
              .ToListAsync();
 
             restaurant.Rating = allRatings.Average();
-
-            _db.Restaurants.Update(restaurant);
             await _db.SaveChangesAsync();
 
             //Find all the Users whose following the blogger 

@@ -36,6 +36,10 @@ namespace FoodiFavs.Controllers
             var restaurant = _db.Restaurants.FirstOrDefault(r => r.Id == RestaurantId);
 
             var FavoriteRes = _db.FavoriteRestaurants.FirstOrDefault(f => f.RestaurantId == RestaurantId && f.UserId == user.Id);
+            if (FavoriteRes!=null) 
+            {
+                return BadRequest($"{restaurant.Name} is already in the favorite list");
+            }
             var notification = new Notification
             {
                 UserId = user.Id,
@@ -45,8 +49,6 @@ namespace FoodiFavs.Controllers
                 NotificationType="Favorite Restaurant",
                 RestaurantId=restaurant.Id,
             };
-            if (FavoriteRes is null)
-            {
                 var Favorite = new FavoriteRestaurants
                 {
                     RestaurantId = RestaurantId,
@@ -54,21 +56,10 @@ namespace FoodiFavs.Controllers
                 };
                 _db.FavoriteRestaurants.Add(Favorite);
                 notification.Message=$"{restaurant.Name} is add to your favorite restaurants list";
-                notification.NotificationType="Favorite Restaurant";
                 _db.Notifications.Add(notification);
                 _db.SaveChanges();
                 return Ok(notification.Message);
-            }
-            else
-            {
-                _db.FavoriteRestaurants.Remove(FavoriteRes);
-                notification.Message=$"{restaurant.Name} is removed from favorite restaurants list";
-                notification.NotificationType="Favorite Restaurant";
-                _db.Notifications.Add(notification);
-                _db.SaveChanges();
-                return Ok(notification.Message);
-            }
-
+            
         }
         [HttpGet("Get-Favorite-Restaurants")]
         public async Task<IActionResult> GetFavoriteRestaurants()
@@ -126,8 +117,10 @@ namespace FoodiFavs.Controllers
             }
 
             var favoriteBloggers = _db.FavoriteBloggers.FirstOrDefault(f => f.BloggerId == BloggerId && f.UserId == user.Id);
-            if (favoriteBloggers is null)
+            if (favoriteBloggers!=null)
             {
+                return BadRequest($"{blogger.UserName} Is already in the list");
+            }
                 var favorite = new FavoriteBlogger
                 {
                     BloggerId = BloggerId,
@@ -151,22 +144,7 @@ namespace FoodiFavs.Controllers
                 _db.SaveChanges();
 
                 return Ok($"{blogger.UserName} has been successfully added to your favorites list!");
-            }
-            else
-            {
-                _db.FavoriteBloggers.Remove(favoriteBloggers);
-                // Remove the message ****************
-              
-                var notification = _db.Notifications.FirstOrDefault(u =>
-                    u.UserId == BloggerId && u.Message.Contains($"{user.UserName} has added you as a favorite blogger!"));
-                if (notification != null)
-                {
-                    _db.Notifications.Remove(notification);
-                }
-                _db.SaveChanges();
-                return Ok($"{blogger.UserName} has been successfully removed from your favorites list!");
-                //return Ok("Removes");
-            }
+            
         }
         [HttpGet("Get-Favorite-Bloggers")]
         public async Task<IActionResult> GetFavoriteBloggers()
@@ -334,10 +312,12 @@ namespace FoodiFavs.Controllers
                     u.ReviewCount,
                     u.TotalLikes,
                     u.TotalPoints,
+                    u.ImgUrl,
                     Reviews = u.Reviews.Select(review => new
                     {
                         review.Id,
                         review.RestaurantNav.Name,
+                        review.RestaurantNav.ImgUrl,
                         review.Rating,
                         review.Comment,
                         review.CreatedAt,
@@ -396,7 +376,6 @@ namespace FoodiFavs.Controllers
 
             return Ok(new { ImageUrl = relativePath });
         }
-
 
 
     }
