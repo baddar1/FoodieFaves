@@ -37,11 +37,7 @@ namespace FF.Models
         [ValidateNever]
         [JsonIgnore]
         public User UserNav { get; set; }
-        //Adding Relationship One To One Between Notification and Reviwe
-        public int? NotificationId { get; set; }
-        [ForeignKey("NotificationId")]
-        [ValidateNever]
-        public Notification? NotificationNav { get; set; }
+       
         //Adding Relationship One To One Between order and Reviwe
         public int? OrderId { get; set; }
         [ForeignKey("OrderId")]
