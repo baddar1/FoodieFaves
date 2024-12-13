@@ -95,8 +95,11 @@ namespace FoodiFavs.Controllers
                         review.CreatedAt,
                         UserName = review.UserNav.UserName,
                         UserId=review.UserNav.Id,
+                        UserImg=review.UserNav.ImgUrl,
+                        TotalLikes=review.Likes,
                         
                     }).ToList()
+                    
                 })
                 .FirstOrDefault();
             if (GetRestaurant!=null)

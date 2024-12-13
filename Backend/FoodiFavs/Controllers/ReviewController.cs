@@ -73,13 +73,17 @@ namespace FoodiFavs.Controllers
             {
                 return BadRequest("Review code is required.");
             }
-
+            
             var order = _db.Orders.FirstOrDefault(o => o.ReviewCode == reviewCode);
             if (order == null)
             {
                 return NotFound("Invalid review code.");
             }
-            var restaurantId = order.RestaurantId;
+            var restaurant = _db.Restaurants.FirstOrDefault(r => r.Id==order.RestaurantId);
+            if (restaurant == null)
+            {
+                return NotFound("No restaurant with this review code.");
+            }
             var CodeUsed = _db.Orders.Any(o => o.Id==order.Id && o.IsUsed==true);
             if (CodeUsed)
             {
@@ -87,7 +91,7 @@ namespace FoodiFavs.Controllers
             }
             order.UserId=user.Id;
             _db.SaveChanges();
-            return Ok($"{restaurantId}");
+            return Ok($"Id = {restaurant.Id} Rsstaurant Name = {restaurant.Name}");
         }
         [HttpPost("Add-Review")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -98,7 +102,7 @@ namespace FoodiFavs.Controllers
         {
             if (obj == null)
             {
-                return BadRequest(obj);
+                return BadRequest("Bad input");
             }
 
             var restaurant = await _db.Restaurants.FirstOrDefaultAsync(r => r.Id == obj.RestaurantId);
@@ -161,8 +165,9 @@ namespace FoodiFavs.Controllers
                 CreatedAt = DateTime.Now,
                 IsRead = false,
                 NotificationType="Points"
+
             };
-            model.NotificationId=notification.Id;
+            
             await _db.SaveChangesAsync();
 
             if (userRestaurantPoints == null)
@@ -172,7 +177,7 @@ namespace FoodiFavs.Controllers
                 {
                     UserId = user.Id,
                     RestaurantId = obj.RestaurantId,
-                    PointsForEachRestaurant = 5,
+                    PointsForEachRestaurant = 500,
                 };
 
                 TopReview.UserId=user.Id;
@@ -191,7 +196,7 @@ namespace FoodiFavs.Controllers
             else
             {
                 // If points already exist, update the points
-                userRestaurantPoints.PointsForEachRestaurant += 5;
+                userRestaurantPoints.PointsForEachRestaurant += 500;
                 
                 notification.Message = $"{user.UserName} You've earned 5 points for your contribution y!";
                 notification.ReviewId=model.Id;
@@ -206,23 +211,21 @@ namespace FoodiFavs.Controllers
                     existingTopReview.TopRate = model.Rating;
 
                     user.TopRateReview = model.Rating;
+                    await _db.SaveChangesAsync();
 
-                    _db.TopReviewForUsers.Update(existingTopReview);
                 }
             }
             userRestaurantPoints.AllPoints=user.TotalPoints;
-
+            
             _db.Notifications.Add(notification);
             await _db.SaveChangesAsync();
-
+ 
             var allRatings = await _db.Reviews
              .Where(r => r.RestaurantId == obj.RestaurantId)
              .Select(r => r.Rating)
              .ToListAsync();
 
             restaurant.Rating = allRatings.Average();
-
-            _db.Restaurants.Update(restaurant);
             await _db.SaveChangesAsync();
 
             //Find all the Users whose following the blogger 
