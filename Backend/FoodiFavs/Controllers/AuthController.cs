@@ -15,6 +15,7 @@ using System.Text;
 using System.Net;
 using FF.Models.Dto.UserDto;
 using FF.Models.Dto.RestaurantDto;
+using Microsoft.AspNetCore.Authentication.Google;
 
 namespace FoodiFavs.Controllers
 {
@@ -57,15 +58,21 @@ namespace FoodiFavs.Controllers
 
             if (!ModelState.IsValid)
             {
+
                 return BadRequest(ModelState);
             }
+
+
             var result = await _authService.RegisterAsync(registerModel);
-           
-            if (result.IsAuthenticated == false)
+
+
+            if (!result.IsAuthenticated)
             {
+
                 return BadRequest(result.Message);
             }
-            
+
+
             return Ok(result);
         }
         [HttpGet("confirm-email")]
@@ -183,30 +190,7 @@ namespace FoodiFavs.Controllers
 
             return Ok(userInfo);
         }
-        [HttpGet("Points-info")]
-        public async Task<IActionResult> GetAllUsersPoints()
-        {
-            var usersWithPoints = await _db.Users
-                .Include(u => u.UserRestaurantPoints)  // Include the user-restaurant points association
-                    .ThenInclude(urp => urp.Restaurant) // Then include restaurant details
-                .Select(u => new UserPointsDto
-                {
-                    UserName = u.UserName,
-                    Email = u.Email,
-                    RestaurantPoints = u.UserRestaurantPoints.Select(urp => new RestaurantPointsDto
-                    {
-                        RestaurantId = urp.RestaurantId,
-                        RestaurantName = urp.Restaurant.Name,
-                        Points = urp.PointsForEachRestaurant
-                    }).ToList()
-                })
-                .ToListAsync();
-
-            return Ok(usersWithPoints);
-        }
-
-
-
+       
         [HttpPost("forgotpassword")]
         public async Task<IActionResult> RequestPasswordReset([FromBody] RequestPasswordResetDto model)
         {
@@ -274,6 +258,7 @@ namespace FoodiFavs.Controllers
 
             return Ok(new { message = "Logged out successfully." });
         }
+        
 
     }
 }

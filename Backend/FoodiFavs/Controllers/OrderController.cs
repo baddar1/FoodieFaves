@@ -38,6 +38,10 @@ namespace FoodiFavs.Controllers
                 return BadRequest();
             }
             Restaurant Restaurant = _db.Restaurants.FirstOrDefault(r => r.Name == RestaurantName);
+            if (Restaurant==null) 
+            {
+                return BadRequest("NO restaurant was found");
+            }
             int RestaurantId = Restaurant.Id;
             Order order = new()
             {

@@ -28,20 +28,22 @@ namespace FF.Models
         [Required]
         public string Location { get; set; }
         [Required]
-        public string Cuisine { get; set; }
+        public List<string> Cuisine { get; set; }//array
         [Required]
         public double Budget { get; set; }
-        [Required]
-        public string ImgUrl { get; set; }
+        public string? ImgUrl { get; set; }
+        public string? LogoImg { get; set; }
+        public List<string>? AdditionalRestaurantImages { get; set; }
+        public string? LiveSite { get; set; }
+        public string? Open { get; set; }
+        public string? Close { get; set; }
+        public int? ReviewCount { get; set; } = 0;
+
+        public string? Description { get; set; }
+        public ICollection<TopReviewForUser>? TopReviews { get; set; }
         public ICollection<FavoriteRestaurants>? FavoriteRestaurants { get; set; }
         public ICollection<FavoriteBlogger> FavoriteBloggers { get; set; }
         public ICollection<Points> UserRestaurantPoints { get; set; }
-        //Adding Relationship One To One Between User and Restaurant
-        //public string? UserId { get; set; }
-        //[ForeignKey("UserId")]
-        //[ValidateNever]
-       // public ICollection<User>? Users { get; set; }
-        //Adding Relationships Many To One Between Restaurnat and Reviwe
         [ValidateNever]
         public ICollection<Review> ReviweNav { get; set; }
         public string? AdminId { get; set; }

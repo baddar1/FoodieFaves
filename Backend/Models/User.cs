@@ -26,7 +26,12 @@ namespace FF.Models
         [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }
-
+        public string? ImgUrl { get; set; }
+        public int TotalLikes { get; set; } = 0;
+        public int? ReviewCount { get; set; } = 0;
+        public int? TotalPoints { get; set; } = 0;
+        public double? TopRateReview { get; set; }
+        public ICollection<TopReviewForUser>? TopReviews { get; set; }
         public ICollection<Points> UserRestaurantPoints { get; set; }
 
         [DisplayName("Phone Number")]
@@ -38,14 +43,6 @@ namespace FF.Models
         //Adding rerlationship Between Restaurant and User
         public ICollection<FavoriteRestaurants>? FavoriteRestaurants { get; set; } = new List<FavoriteRestaurants>();
         public ICollection<FavoriteBlogger>? FavoriteBloggers { get; set; } = new List<FavoriteBlogger>();
-        //Adding Relationship in the User
-        //public string? UserId { get; set; }
-        //[ForeignKey("UserId")]
-        //[ValidateNever]
-        //public User? UserNav { get; set; }
-        //Navigation for the User Nav
-        //public ICollection<User>? FavoriteBloggers { get; set; }
-        //Adding rerlationship Between Reviwe and User
         public ICollection<Review>? Reviews { get; set; }
 
        // Foreign key to ApplicationUser

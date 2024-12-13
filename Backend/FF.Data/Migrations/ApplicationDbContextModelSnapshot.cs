@@ -102,7 +102,27 @@ namespace FF.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ReviewId")
+                    b.Property<string>("BloggertId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NotificationType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("RestaurantId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReviewId")
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
@@ -126,6 +146,9 @@ namespace FF.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
                     b.Property<int>("RestaurantId")
                         .HasColumnType("int");
 
@@ -137,9 +160,19 @@ namespace FF.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("ReviewId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("RestaurantId");
+
+                    b.HasIndex("ReviewId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Orders");
                 });
@@ -191,6 +224,9 @@ namespace FF.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AllPoints")
+                        .HasColumnType("int");
+
                     b.Property<int>("PointsForEachRestaurant")
                         .HasColumnType("int");
 
@@ -218,14 +254,23 @@ namespace FF.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AdditionalRestaurantImages")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("AdminId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<double>("Budget")
                         .HasColumnType("float");
 
+                    b.Property<string>("Close")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Cuisine")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
@@ -233,19 +278,30 @@ namespace FF.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImgUrl")
-                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LiveSite")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Location")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("LogoImg")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Open")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<double>("Rating")
                         .HasColumnType("float");
+
+                    b.Property<int?>("ReviewCount")
+                        .HasColumnType("int");
 
                     b.Property<string>("phoneNumber")
                         .IsRequired()
@@ -263,25 +319,53 @@ namespace FF.Data.Migrations
                         {
                             Id = 1,
                             Budget = 3.5,
-                            Cuisine = "Fried Chicken",
+                            Cuisine = "[\"Fried Chicken\",\"shawarmah\"]",
                             Email = "",
                             ImgUrl = "Photo",
                             Location = "Abdllah Ghosheh Street",
                             Name = "Nashville",
                             Rating = 0.0,
+                            ReviewCount = 0,
                             phoneNumber = "0799902599"
                         },
                         new
                         {
                             Id = 2,
                             Budget = 4.0,
-                            Cuisine = "Burger",
+                            Cuisine = "[\"Burger\",\"shawarmah\"]",
                             Email = "",
                             ImgUrl = "Photo",
                             Location = "Abdoun Circle",
                             Name = "X Burger",
                             Rating = 0.0,
+                            ReviewCount = 0,
                             phoneNumber = "0790067776"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Budget = 4.0999999999999996,
+                            Cuisine = "[\"shawarmah\"]",
+                            Email = "",
+                            ImgUrl = "Photo",
+                            Location = "Jubiha",
+                            Name = "saj",
+                            Rating = 0.0,
+                            ReviewCount = 0,
+                            phoneNumber = "0799902599"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Budget = 2.0,
+                            Cuisine = "[\"meet\",\"chiken\"]",
+                            Email = "",
+                            ImgUrl = "Photo",
+                            Location = "Jubiha",
+                            Name = "Reem",
+                            Rating = 0.0,
+                            ReviewCount = 0,
+                            phoneNumber = "0799902599"
                         });
                 });
 
@@ -299,10 +383,16 @@ namespace FF.Data.Migrations
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool?>("IsReported")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("Likes")
                         .HasColumnType("int");
 
-                    b.Property<int?>("NotificationId")
+                    b.Property<int?>("OrderId")
                         .HasColumnType("int");
 
                     b.Property<int?>("Points")
@@ -322,35 +412,13 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("AdminId");
 
-                    b.HasIndex("NotificationId");
+                    b.HasIndex("OrderId");
 
                     b.HasIndex("RestaurantId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("Reviews");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Comment = "Nashville Fried Chicken, so so perfect !!",
-                            Likes = 100,
-                            Points = 0,
-                            Rating = 4.7000000000000002,
-                            RestaurantId = 1,
-                            UserId = "1"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Comment = "Nashville Fried Chicken, so perfect !!",
-                            Likes = 100,
-                            Points = 0,
-                            Rating = 4.5,
-                            RestaurantId = 1,
-                            UserId = "2"
-                        });
                 });
 
             modelBuilder.Entity("FF.Models.Secuirty.ApplicationUser", b =>
@@ -418,6 +486,38 @@ namespace FF.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("FF.Models.TopReviewForUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("RestaurantId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReviewId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("TopRate")
+                        .HasColumnType("float");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RestaurantId");
+
+                    b.HasIndex("ReviewId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TopReviewForUsers");
+                });
+
             modelBuilder.Entity("FF.Models.User", b =>
                 {
                     b.Property<string>("Id")
@@ -436,6 +536,9 @@ namespace FF.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ImgUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -443,6 +546,18 @@ namespace FF.Data.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
+
+                    b.Property<int?>("ReviewCount")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("TopRateReview")
+                        .HasColumnType("float");
+
+                    b.Property<int>("TotalLikes")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TotalPoints")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -458,22 +573,47 @@ namespace FF.Data.Migrations
                         .HasFilter("[ApplicationUserId] IS NOT NULL");
 
                     b.ToTable("Users");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            Id = "1",
-                            Email = "YazeedNada@gmail.com",
-                            Password = "Yazeed12.",
-                            UserName = "YazeedNada"
-                        },
-                        new
-                        {
-                            Id = "2",
-                            Email = "Mohammadbaddar@gmail.com",
-                            Password = "Mohd12.",
-                            UserName = "Mohammadbaddar"
-                        });
+            modelBuilder.Entity("FF.Models.Vouchers", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ExpirationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("RestaurantId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("voucherCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("voucherType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RestaurantId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("vouchers");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -674,9 +814,7 @@ namespace FF.Data.Migrations
                 {
                     b.HasOne("FF.Models.Review", "ReviewNav")
                         .WithMany()
-                        .HasForeignKey("ReviewId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ReviewId");
 
                     b.HasOne("FF.Models.User", "UserNav")
                         .WithMany("Notifications")
@@ -697,7 +835,19 @@ namespace FF.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("FF.Models.Review", "ReviewNav")
+                        .WithMany()
+                        .HasForeignKey("ReviewId");
+
+                    b.HasOne("FF.Models.User", "UserNav")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
                     b.Navigation("Restaurant");
+
+                    b.Navigation("ReviewNav");
+
+                    b.Navigation("UserNav");
                 });
 
             modelBuilder.Entity("FF.Models.Points", b =>
@@ -734,9 +884,9 @@ namespace FF.Data.Migrations
                         .WithMany("ManageReviews")
                         .HasForeignKey("AdminId");
 
-                    b.HasOne("FF.Models.Notification", "NotificationNav")
+                    b.HasOne("FF.Models.Order", "OrderNav")
                         .WithMany()
-                        .HasForeignKey("NotificationId");
+                        .HasForeignKey("OrderId");
 
                     b.HasOne("FF.Models.Restaurant", "RestaurantNav")
                         .WithMany("ReviweNav")
@@ -752,9 +902,36 @@ namespace FF.Data.Migrations
 
                     b.Navigation("AdminNav");
 
-                    b.Navigation("NotificationNav");
+                    b.Navigation("OrderNav");
 
                     b.Navigation("RestaurantNav");
+
+                    b.Navigation("UserNav");
+                });
+
+            modelBuilder.Entity("FF.Models.TopReviewForUser", b =>
+                {
+                    b.HasOne("FF.Models.Restaurant", "RestaurantNav")
+                        .WithMany("TopReviews")
+                        .HasForeignKey("RestaurantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FF.Models.Review", "ReviewNav")
+                        .WithMany("TopReviews")
+                        .HasForeignKey("ReviewId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FF.Models.User", "UserNav")
+                        .WithMany("TopReviews")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("RestaurantNav");
+
+                    b.Navigation("ReviewNav");
 
                     b.Navigation("UserNav");
                 });
@@ -772,6 +949,25 @@ namespace FF.Data.Migrations
                     b.Navigation("AdminNav");
 
                     b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("FF.Models.Vouchers", b =>
+                {
+                    b.HasOne("FF.Models.Restaurant", "RestaurantNav")
+                        .WithMany()
+                        .HasForeignKey("RestaurantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FF.Models.User", "UserNav")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RestaurantNav");
+
+                    b.Navigation("UserNav");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -844,12 +1040,16 @@ namespace FF.Data.Migrations
 
                     b.Navigation("ReviweNav");
 
+                    b.Navigation("TopReviews");
+
                     b.Navigation("UserRestaurantPoints");
                 });
 
             modelBuilder.Entity("FF.Models.Review", b =>
                 {
                     b.Navigation("LikesNav");
+
+                    b.Navigation("TopReviews");
                 });
 
             modelBuilder.Entity("FF.Models.Secuirty.ApplicationUser", b =>
@@ -869,6 +1069,8 @@ namespace FF.Data.Migrations
                     b.Navigation("Notifications");
 
                     b.Navigation("Reviews");
+
+                    b.Navigation("TopReviews");
 
                     b.Navigation("UserRestaurantPoints");
                 });

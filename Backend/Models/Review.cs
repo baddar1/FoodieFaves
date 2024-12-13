@@ -20,6 +20,11 @@ namespace FF.Models
         public string? Comment{ get; set; }
         public int? Likes { get; set; } = 0;
         public int? Points { get; set; } = 0;
+        public bool? IsReported { get; set; }
+   
+        public DateTime? CreatedAt { get; set; } = DateTime.Now;
+        public ICollection<TopReviewForUser> TopReviews { get; set; }
+
         //Navigation for the Relationship Many To one Brtween Restaurant and Reviwe
         public int RestaurantId { get; set; }
         [ForeignKey("RestaurantId")]
@@ -32,12 +37,12 @@ namespace FF.Models
         [ValidateNever]
         [JsonIgnore]
         public User UserNav { get; set; }
-        //Adding Relationship One To One Between Notification and Reviwe
-        public int? NotificationId { get; set; }
-        [ForeignKey("NotificationId")]
+       
+        //Adding Relationship One To One Between order and Reviwe
+        public int? OrderId { get; set; }
+        [ForeignKey("OrderId")]
         [ValidateNever]
-        public Notification? NotificationNav { get; set; }
-
+        public Order? OrderNav { get; set; }
         public string? AdminId { get; set; }
         [ForeignKey("AdminId")]
         [ValidateNever]
