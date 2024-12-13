@@ -91,7 +91,7 @@ namespace FoodiFavs.Controllers
             }
             order.UserId=user.Id;
             _db.SaveChanges();
-            return Ok($"Id = {restaurant.Id} Rsstaurant Name = {restaurant.Name}");
+            return Ok($"{restaurant}");
         }
         [HttpPost("Add-Review")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -126,31 +126,34 @@ namespace FoodiFavs.Controllers
                 RestaurantId=obj.RestaurantId,
             };
 
-            
+            //To count reviews number for each user
+                user.ReviewCount++;
+                user.TotalPoints+=5;
+                restaurant.ReviewCount++;
             _db.Reviews.Add(model);
             await _db.SaveChangesAsync();
 
             var order = _db.Orders.FirstOrDefault(o => o.UserId == user.Id && o.RestaurantId == restaurant.Id && o.IsUsed == false);
 
-            if (order!=null)
-            {
-                order.ReviewId=model.Id;
-                order.IsUsed=true;
-                model.OrderId=order.Id;
+            //if (order!=null)
+            //{
+            //    order.ReviewId=model.Id;
+            //    order.IsUsed=true;
+            //    model.OrderId=order.Id;
 
-                //To count reviews number for each user
-                user.ReviewCount++;
-                user.TotalPoints+=5;
-                restaurant.ReviewCount++;
+            //    //To count reviews number for each user
+            //    user.ReviewCount++;
+            //    user.TotalPoints+=5;
+            //    restaurant.ReviewCount++;
 
-                await _db.SaveChangesAsync();
-            }
-            else
-            {
-                _db.Reviews.Remove(model);
-                await _db.SaveChangesAsync();
-                return NotFound("The review code Is already used");
-            }
+            //    await _db.SaveChangesAsync();
+            //}
+            //else
+            //{
+            //    _db.Reviews.Remove(model);
+            //    await _db.SaveChangesAsync();
+            //    return NotFound("The review code Is already used");
+            //}
             
 
             var TopReview = new TopReviewForUser();
@@ -177,7 +180,7 @@ namespace FoodiFavs.Controllers
                 {
                     UserId = user.Id,
                     RestaurantId = obj.RestaurantId,
-                    PointsForEachRestaurant = 500,
+                    PointsForEachRestaurant = 5,
                 };
 
                 TopReview.UserId=user.Id;
@@ -196,7 +199,7 @@ namespace FoodiFavs.Controllers
             else
             {
                 // If points already exist, update the points
-                userRestaurantPoints.PointsForEachRestaurant += 500;
+                userRestaurantPoints.PointsForEachRestaurant += 5;
                 
                 notification.Message = $"{user.UserName} You've earned 5 points for your contribution y!";
                 notification.ReviewId=model.Id;
