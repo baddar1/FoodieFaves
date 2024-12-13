@@ -13,9 +13,11 @@ namespace FF.Models
     {
         public int Id { get; set; }
         public string RestaurantName { get; set; }
-        public Restaurant Restaurant { get; set; }
-        [ForeignKey("Restaurant")]
         public int RestaurantId { get; set; }
+        [ForeignKey("RestaurantId")]
+        [JsonIgnore]
+        public Restaurant Restaurant { get; set; }
+        
 
         public string ReviewCode { get; set; }
         public bool IsUsed { get; set;}=false;
