@@ -24,6 +24,7 @@ namespace FF.Data.Access.Data
         public DbSet<TopReviewForUser>TopReviewForUsers { get; set; }
         public DbSet<FavoriteRestaurants> FavoriteRestaurants { get; set; }
         public DbSet<FavoriteBlogger> FavoriteBloggers { get; set; }
+        public DbSet<Vouchers> vouchers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -58,6 +59,7 @@ namespace FF.Data.Access.Data
                 .WithMany(r => r.TopReviews)
                 .HasForeignKey(tr => tr.RestaurantId)
                 .OnDelete(DeleteBehavior.Restrict);
+
 
             builder.Entity<Restaurant>().HasData(
                 new Restaurant

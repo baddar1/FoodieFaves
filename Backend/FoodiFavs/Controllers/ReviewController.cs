@@ -73,13 +73,17 @@ namespace FoodiFavs.Controllers
             {
                 return BadRequest("Review code is required.");
             }
-
+            
             var order = _db.Orders.FirstOrDefault(o => o.ReviewCode == reviewCode);
             if (order == null)
             {
                 return NotFound("Invalid review code.");
             }
-            var restaurantId = order.RestaurantId;
+            var restaurant = _db.Restaurants.FirstOrDefault(r => r.Id==order.RestaurantId);
+            if (restaurant == null)
+            {
+                return NotFound("No restaurant with this review code.");
+            }
             var CodeUsed = _db.Orders.Any(o => o.Id==order.Id && o.IsUsed==true);
             if (CodeUsed)
             {
@@ -87,7 +91,7 @@ namespace FoodiFavs.Controllers
             }
             order.UserId=user.Id;
             _db.SaveChanges();
-            return Ok($"{restaurantId}");
+            return Ok($"Id = {restaurant.Id} Rsstaurant Name = {restaurant.Name}");
         }
         [HttpPost("Add-Review")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -173,7 +177,7 @@ namespace FoodiFavs.Controllers
                 {
                     UserId = user.Id,
                     RestaurantId = obj.RestaurantId,
-                    PointsForEachRestaurant = 5,
+                    PointsForEachRestaurant = 500,
                 };
 
                 TopReview.UserId=user.Id;
@@ -192,7 +196,7 @@ namespace FoodiFavs.Controllers
             else
             {
                 // If points already exist, update the points
-                userRestaurantPoints.PointsForEachRestaurant += 5;
+                userRestaurantPoints.PointsForEachRestaurant += 500;
                 
                 notification.Message = $"{user.UserName} You've earned 5 points for your contribution y!";
                 notification.ReviewId=model.Id;
