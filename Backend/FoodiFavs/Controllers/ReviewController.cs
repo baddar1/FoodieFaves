@@ -91,7 +91,7 @@ namespace FoodiFavs.Controllers
             }
             order.UserId=user.Id;
             _db.SaveChanges();
-            return Ok($"Id = {restaurant.Id} Rsstaurant Name = {restaurant.Name}");
+            return Ok($"{restaurant}");
         }
         [HttpPost("Add-Review")]
         [ProducesResponseType(StatusCodes.Status200OK)]
