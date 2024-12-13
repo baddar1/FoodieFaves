@@ -29,7 +29,7 @@ namespace FF.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Admins");
+                    b.ToTable("Admins", (string)null);
                 });
 
             modelBuilder.Entity("FF.Models.FavoriteBlogger", b =>
@@ -49,7 +49,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("RestaurantId");
 
-                    b.ToTable("FavoriteBloggers");
+                    b.ToTable("FavoriteBloggers", (string)null);
                 });
 
             modelBuilder.Entity("FF.Models.FavoriteRestaurants", b =>
@@ -64,7 +64,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("RestaurantId");
 
-                    b.ToTable("FavoriteRestaurants");
+                    b.ToTable("FavoriteRestaurants", (string)null);
                 });
 
             modelBuilder.Entity("FF.Models.Like", b =>
@@ -91,7 +91,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Likes");
+                    b.ToTable("Likes", (string)null);
                 });
 
             modelBuilder.Entity("FF.Models.Notification", b =>
@@ -135,7 +135,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notifications", (string)null);
                 });
 
             modelBuilder.Entity("FF.Models.Order", b =>
@@ -174,7 +174,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("FF.Models.PendingUser", b =>
@@ -213,7 +213,7 @@ namespace FF.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PendingUsers");
+                    b.ToTable("PendingUsers", (string)null);
                 });
 
             modelBuilder.Entity("FF.Models.Points", b =>
@@ -243,7 +243,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Points");
+                    b.ToTable("Points", (string)null);
                 });
 
             modelBuilder.Entity("FF.Models.Restaurant", b =>
@@ -312,7 +312,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("AdminId");
 
-                    b.ToTable("Restaurants");
+                    b.ToTable("Restaurants", (string)null);
 
                     b.HasData(
                         new
@@ -418,7 +418,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Reviews");
+                    b.ToTable("Reviews", (string)null);
                 });
 
             modelBuilder.Entity("FF.Models.Secuirty.ApplicationUser", b =>
@@ -515,7 +515,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TopReviewForUsers");
+                    b.ToTable("TopReviewForUsers", (string)null);
                 });
 
             modelBuilder.Entity("FF.Models.User", b =>
@@ -572,7 +572,7 @@ namespace FF.Data.Migrations
                         .IsUnique()
                         .HasFilter("[ApplicationUserId] IS NOT NULL");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("FF.Models.Vouchers", b =>
@@ -613,7 +613,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("vouchers");
+                    b.ToTable("vouchers", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
