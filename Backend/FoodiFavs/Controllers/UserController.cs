@@ -79,6 +79,8 @@ namespace FoodiFavs.Controllers
                 .Include(fr => fr.Restaurant) 
                 .Select(fr => new
                 {
+                    fr.Restaurant.Id,
+                    fr.Restaurant.ReviewCount,
                     fr.Restaurant.Name,    
                     fr.Restaurant.Open,
                     fr.Restaurant.Close,
@@ -173,7 +175,9 @@ namespace FoodiFavs.Controllers
                             tr.ReviewId,
                             tr.ReviewNav.Comment,
                             tr.ReviewNav.Rating,
-                            tr.ReviewNav.CreatedAt
+                            tr.ReviewNav.CreatedAt,
+                            tr.ReviewNav.Likes,
+                            
                         }).FirstOrDefault(),
 
                     // Select the restaurant info
