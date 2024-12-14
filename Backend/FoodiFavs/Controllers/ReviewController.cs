@@ -94,7 +94,7 @@ namespace FoodiFavs.Controllers
             return Ok(new 
             {
             restaurant.Id,
-            restaurant.Name
+            restaurant.Name,
             });
         }
         [HttpPost("Add-Review")]

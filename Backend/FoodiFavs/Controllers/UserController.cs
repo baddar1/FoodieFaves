@@ -321,6 +321,7 @@ namespace FoodiFavs.Controllers
                     Reviews = u.Reviews.Select(review => new
                     {
                         review.Id,
+                        review.RestaurantId,
                         review.RestaurantNav.Name,
                         review.RestaurantNav.ImgUrl,
                         review.Rating,
@@ -381,6 +382,47 @@ namespace FoodiFavs.Controllers
 
             return Ok(new { ImageUrl = relativePath });
         }
+        [HttpGet("Get-User-Reviews-ById")]
+        public IActionResult GetUserReviews(string Id)
+        {
+
+            var user = _db.Users.FirstOrDefault(u => u.Id == Id);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+            var userReviews = _db.Users
+               .Where(u => u.Id==user.Id)
+               .Select(u => new
+               {
+                   u.Id,
+                   u.UserName,
+                   u.ReviewCount,
+                   u.TotalLikes,
+                   u.TotalPoints,
+                   u.ImgUrl,
+                   Reviews = u.Reviews.Select(review => new
+                   {
+                       review.Id,
+                       review.RestaurantId,
+                       review.RestaurantNav.Name,
+                       review.RestaurantNav.ImgUrl,
+                       review.Rating,
+                       review.Comment,
+                       review.CreatedAt,
+                       review.Likes,
+
+                   }).ToList()
+               }).FirstOrDefault();
+
+            if (userReviews == null)
+                return NotFound();
+
+            return Ok(userReviews);
+
+
+        }
+
 
 
     }
