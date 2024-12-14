@@ -24,7 +24,7 @@ namespace FF.Data.Access.Data
         public DbSet<TopReviewForUser>TopReviewForUsers { get; set; }
         public DbSet<FavoriteRestaurants> FavoriteRestaurants { get; set; }
         public DbSet<FavoriteBlogger> FavoriteBloggers { get; set; }
-        public DbSet<Vouchers> vouchers { get; set; }
+        public DbSet<Vouchers> Vouchers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
