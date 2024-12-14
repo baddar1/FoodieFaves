@@ -228,7 +228,8 @@ namespace FoodiFavs.Controllers
              .Select(r => r.Rating)
              .ToListAsync();
 
-            restaurant.Rating = allRatings.Average();
+            restaurant.Rating = Math.Floor(allRatings.Average() * 10) / 10;
+            
             await _db.SaveChangesAsync();
 
             //Find all the Users whose following the blogger 
