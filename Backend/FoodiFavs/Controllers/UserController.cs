@@ -300,7 +300,7 @@ namespace FoodiFavs.Controllers
             return Ok("Favorite restaurant removed successfully." );
         }
         [HttpGet("Get-All-User-Reviews")]
-        public async Task<IActionResult> GetAllUserReviews()
+        public Task<IActionResult> GetAllUserReviews()
         {
             var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = _db.Users.FirstOrDefault(u => u.UserName == userName);

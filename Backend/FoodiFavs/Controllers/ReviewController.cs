@@ -130,35 +130,31 @@ namespace FoodiFavs.Controllers
                 RestaurantId=obj.RestaurantId,
             };
 
-            //To count reviews number for each user
-                user.ReviewCount++;
-                user.TotalPoints+=5;
-                restaurant.ReviewCount++;
             _db.Reviews.Add(model);
             await _db.SaveChangesAsync();
 
             var order = _db.Orders.FirstOrDefault(o => o.UserId == user.Id && o.RestaurantId == restaurant.Id && o.IsUsed == false);
 
-            //if (order!=null)
-            //{
-            //    order.ReviewId=model.Id;
-            //    order.IsUsed=true;
-            //    model.OrderId=order.Id;
+            if (order!=null)
+            {
+                order.ReviewId=model.Id;
+                order.IsUsed=true;
+                model.OrderId=order.Id;
 
-            //    //To count reviews number for each user
-            //    user.ReviewCount++;
-            //    user.TotalPoints+=5;
-            //    restaurant.ReviewCount++;
+                //To count reviews number for each user
+                user.ReviewCount++;
+                user.TotalPoints+=5;
+                restaurant.ReviewCount++;
 
-            //    await _db.SaveChangesAsync();
-            //}
-            //else
-            //{
-            //    _db.Reviews.Remove(model);
-            //    await _db.SaveChangesAsync();
-            //    return NotFound("The review code Is already used");
-            //}
-            
+                await _db.SaveChangesAsync();
+            }
+            else
+            {
+                _db.Reviews.Remove(model);
+                await _db.SaveChangesAsync();
+                return NotFound("The review code Is already used");
+            }
+
 
             var TopReview = new TopReviewForUser();
 
