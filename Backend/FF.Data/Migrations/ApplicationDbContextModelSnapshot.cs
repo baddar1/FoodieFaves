@@ -170,6 +170,10 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("RestaurantId");
 
+                    b.HasIndex("ReviewId");
+
+                    b.HasIndex("UserId");
+
                     b.ToTable("Orders");
                 });
 
@@ -415,63 +419,6 @@ namespace FF.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Reviews");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Comment = "Nashville Fried Chicken, so so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 11, 12, 39, 41, 588, DateTimeKind.Local).AddTicks(5579),
-                            Likes = 100,
-                            Points = 0,
-                            Rating = 4.7000000000000002,
-                            RestaurantId = 1,
-                            UserId = "1"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Comment = "so Juciyy !!",
-                            CreatedAt = new DateTime(2024, 12, 11, 12, 39, 41, 588, DateTimeKind.Local).AddTicks(5597),
-                            Likes = 100,
-                            Points = 0,
-                            Rating = 4.0999999999999996,
-                            RestaurantId = 3,
-                            UserId = "1"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 11, 12, 39, 41, 588, DateTimeKind.Local).AddTicks(5601),
-                            Likes = 100,
-                            Points = 0,
-                            Rating = 4.5,
-                            RestaurantId = 1,
-                            UserId = "2"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 11, 12, 39, 41, 588, DateTimeKind.Local).AddTicks(5605),
-                            Likes = 105,
-                            Points = 0,
-                            Rating = 4.5,
-                            RestaurantId = 1,
-                            UserId = "2"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Comment = "Nashville Fried Chicken, so perfect !!",
-                            CreatedAt = new DateTime(2024, 12, 11, 12, 39, 41, 588, DateTimeKind.Local).AddTicks(5608),
-                            Likes = 99,
-                            Points = 0,
-                            Rating = 4.5,
-                            RestaurantId = 1,
-                            UserId = "2"
-                        });
                 });
 
             modelBuilder.Entity("FF.Models.Secuirty.ApplicationUser", b =>
@@ -626,30 +573,6 @@ namespace FF.Data.Migrations
                         .HasFilter("[ApplicationUserId] IS NOT NULL");
 
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "1",
-                            Email = "YazeedNada@gmail.com",
-                            ImgUrl = "Y!",
-                            Password = "Yazeed12.",
-                            ReviewCount = 0,
-                            TotalLikes = 0,
-                            TotalPoints = 0,
-                            UserName = "YazeedNada"
-                        },
-                        new
-                        {
-                            Id = "2",
-                            Email = "Mohammadbaddar@gmail.com",
-                            ImgUrl = "M!",
-                            Password = "Mohd12.",
-                            ReviewCount = 0,
-                            TotalLikes = 0,
-                            TotalPoints = 0,
-                            UserName = "Mohammadbaddar"
-                        });
                 });
 
             modelBuilder.Entity("FF.Models.Vouchers", b =>
@@ -690,7 +613,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("vouchers");
+                    b.ToTable("vouchers", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
