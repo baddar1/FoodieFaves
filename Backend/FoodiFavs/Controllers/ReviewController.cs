@@ -247,6 +247,7 @@ namespace FoodiFavs.Controllers
                     Message = $"{user.UserName}, your favorite blogger, has written a new review for {restaurant.Name}!",
                     CreatedAt = DateTime.Now,
                     IsRead = false,
+                    //BloggertId= followerId,
                     ReviewId=model.Id,
                     RestaurantId=restaurant.Id,
                     NotificationType="Review"
@@ -269,13 +270,50 @@ namespace FoodiFavs.Controllers
             {
                 return BadRequest();
             }
-            var Review = _db.Reviews.FirstOrDefault(u => u.Id==Id);
+            var Review = _db.Reviews.FirstOrDefault(r => r.Id==Id);
             if (Review == null)
             {
                 return NotFound();
             }
-            Review.UserNav.ReviewCount--;
+
+            var userId = Review.UserId;
+            var user=_db.Users.FirstOrDefault(u => u.Id==userId);
+            var TopRate = _db.TopReviewForUsers.FirstOrDefault(u => u.UserId==userId);
+            var points = _db.Points.FirstOrDefault(p => p.UserId==userId);
+            var restaurants = _db.Restaurants.FirstOrDefault(r => r.Id==Review.RestaurantId);
+            var notification=_db.Notifications.FirstOrDefault(n => n.UserId==userId && n.ReviewId==Review.Id);
+            var order=_db.Orders.FirstOrDefault(o => o.ReviewId==Review.Id);
+
+            _db.Orders.Remove(order);
+            _db.Notifications.Remove(notification);
+            
             _db.Reviews.Remove(Review);
+            _db.SaveChanges();
+
+            
+            restaurants.ReviewCount--;
+            points.PointsForEachRestaurant-=5;
+            points.AllPoints-=5;
+            user.TotalLikes-=Review.Likes;
+            user.TotalPoints-=5;
+            Review.UserNav.ReviewCount--;
+
+
+            if (TopRate != null)
+            {
+                var topRatedReview = _db.Reviews
+                        .Where(r => r.UserId == userId)
+                        .OrderByDescending(r => r.Rating)
+                        .FirstOrDefault();
+                if (topRatedReview != null)
+                {
+                    user.TopRateReview=topRatedReview.Rating;
+                    TopRate.ReviewId=topRatedReview.Id;
+                    TopRate.TopRate=topRatedReview.Rating;
+                    TopRate.RestaurantId=topRatedReview.RestaurantId;
+                }
+            }
+
             _db.SaveChanges();
             return NoContent();
         }

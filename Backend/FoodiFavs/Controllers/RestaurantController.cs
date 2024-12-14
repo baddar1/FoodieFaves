@@ -193,6 +193,7 @@ namespace FoodiFavs.Controllers
             Restaurant.Email = obj.Email;
             Restaurant.Budget = obj.Budget;
             Restaurant.ImgUrl = obj.ImgUrl;
+            Restaurant.LogoImg=obj.LogoImg;
             Restaurant.LiveSite=obj.LiveSite;
             Restaurant.Open=obj.Open;
             Restaurant.Close=obj.Close;
