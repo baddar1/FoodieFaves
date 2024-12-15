@@ -322,6 +322,7 @@ namespace FoodiFavs.Controllers
                    u.TotalPoints,
                    u.ImgUrl,
                }).ToList();
+                return Ok(userReviews);
             }
             else
             {
