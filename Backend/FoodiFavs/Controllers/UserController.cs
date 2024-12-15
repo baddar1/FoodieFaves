@@ -304,40 +304,53 @@ namespace FoodiFavs.Controllers
         {
             var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = _db.Users.FirstOrDefault(u => u.UserName == userName);
-            if (user.Id==null) 
+            if (user==null) 
             {
                 return BadRequest();
             }
-             var userReviews = _db.Users
-                .Where(u => u.Id==user.Id)
-                .Select(u => new
-                {
-                    u.Id,
-                    u.UserName,
-                    u.ReviewCount,
-                    u.TotalLikes,
-                    u.TotalPoints,
-                    u.ImgUrl,
-                    Reviews = u.Reviews.Select(review => new
-                    {
-                        review.Id,
-                        review.RestaurantId,
-                        review.RestaurantNav.Name,
-                        review.RestaurantNav.ImgUrl,
-                        review.Rating,
-                        review.Comment,
-                        review.CreatedAt,
-                        review.Likes,
+            var reviews = _db.Reviews.FirstOrDefault(r => r.UserId==user.Id);
+            if (reviews == null)
+            {
+                var userReviews = _db.Users
+               .Where(u => u.Id==user.Id)
+               .Select(u => new
+               {
+                   u.Id,
+                   u.UserName,
+                   u.ReviewCount,
+                   u.TotalLikes,
+                   u.TotalPoints,
+                   u.ImgUrl,
+               }).ToList();
+            }
+            else
+            {
+                var userReviews = _db.Users
+                   .Where(u => u.Id==user.Id)
+                   .Select(u => new
+                   {
+                       u.Id,
+                       u.UserName,
+                       u.ReviewCount,
+                       u.TotalLikes,
+                       u.TotalPoints,
+                       u.ImgUrl,
+                       Reviews = u.Reviews.Select(review => new
+                       {
+                           review.Id,
+                           review.RestaurantId,
+                           review.RestaurantNav.Name,
+                           review.RestaurantNav.ImgUrl,
+                           review.Rating,
+                           review.Comment,
+                           review.CreatedAt,
+                           review.Likes,
 
-                    }).ToList()
-                }).FirstOrDefault();
-
-            if (userReviews == null)
-                return NotFound();
-
-            return Ok(userReviews);
-
-
+                       }).ToList()
+                   }).FirstOrDefault();
+                return Ok(userReviews);
+            }
+            
         }
         [HttpPost("upload-Users-images")]
         public async Task<IActionResult> UploadUserImage(IFormFile file)
