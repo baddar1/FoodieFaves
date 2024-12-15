@@ -281,9 +281,7 @@ namespace FoodiFavs.Controllers
                     return BadRequest("Rating must be between 1 and 5.");
                 }
 
-                var lowerBound = rating.Value;
-                var upperBound = lowerBound + 0.9;
-                query = query.Where(r => r.Rating >= lowerBound && r.Rating <= upperBound);
+                query = query.Where(r => r.Rating>=rating);
             }
 
             // Fetch and sort the data
