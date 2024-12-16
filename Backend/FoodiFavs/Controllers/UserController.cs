@@ -321,7 +321,7 @@ namespace FoodiFavs.Controllers
                    u.TotalLikes,
                    u.TotalPoints,
                    u.ImgUrl,
-               }).ToList();
+               }).FirstOrDefault();
                 return Ok(userReviews);
             }
             else
