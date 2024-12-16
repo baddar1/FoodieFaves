@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 
 namespace FoodiFavs.Controllers
 {
@@ -23,7 +24,7 @@ namespace FoodiFavs.Controllers
         }
 
         [HttpPost("BuyVoucher")]
-        public IActionResult BuyVoucher(int points,int restaurantId)
+        public IActionResult BuyVoucher(int points, int restaurantId)
         {
             var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = _db.Users.FirstOrDefault(u => u.UserName == userName);
@@ -31,9 +32,9 @@ namespace FoodiFavs.Controllers
             {
                 return Unauthorized(); // Return 401 if user is not logged in
             }
-            
+
             var RestaurantPoints = _db.Points.FirstOrDefault(p => p.UserId==user.Id && p.RestaurantId==restaurantId);
-            if (RestaurantPoints==null) 
+            if (RestaurantPoints==null)
             {
                 return BadRequest($"Sorry {user.UserName} try to Review restaurants to get points");
             }
@@ -89,11 +90,11 @@ namespace FoodiFavs.Controllers
                     voucherCode = formattedCode
                 };
             }
-            else 
+            else
             {
                 return BadRequest("Please select a Voucher");
             }
-            _db.vouchers.Add(SetVoucher);
+            _db.Vouchers.Add(SetVoucher);
             _db.SaveChanges();
             user.TotalPoints-=points;
             RestaurantPoints.AllPoints-=points;
@@ -102,6 +103,92 @@ namespace FoodiFavs.Controllers
             return Ok($"{SetVoucher.voucherCode}");
 
         }
+        [HttpPost("Use-Voucher")]
+        public async Task<IActionResult> UseVoucher(string voucherCode)
+        {
+            // Find the voucher by code
+            var voucher = await _db.Vouchers
+                .FirstOrDefaultAsync(v => v.voucherCode == voucherCode);
+
+            if (voucher == null)
+            {
+                return BadRequest("Invalid voucher code.");
+            }
+
+            // Check if the voucher is expired
+            if (voucher.ExpirationDate < DateTime.UtcNow)
+            {
+                return BadRequest("This voucher has expired.");
+            }
+
+            // Check if the voucher has already been used
+            if (voucher.IsUsed)
+            {
+                return BadRequest("This voucher has already been used.");
+            }
+
+            // Apply the discount logic here (e.g., deduct from total price)
+            voucher.IsUsed = true;  // Mark voucher as used
+            _db.Vouchers.Update(voucher);
+            await _db.SaveChangesAsync();
+
+            return Ok("Voucher applied successfully.");
+        }
+        [HttpGet("Get-Vouchers")]
+        public async Task<IActionResult> GetVouchers()
+        {
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userName == null)
+            {
+                return Unauthorized(); // User is not logged in
+            }
+            var user = _db.Users.FirstOrDefault(u => u.UserName == userName);
+
+            var userVouchers = _db.Vouchers.Where(v => v.UserId == user.Id).ToList();
+
+            //Filter expired vouchers
+            var expiredVouchers = userVouchers.Where(v => v.ExpirationDate < DateTime.UtcNow).ToList();
+
+            if (expiredVouchers.Any())
+            {
+                //Delete expired vouchers
+                _db.Vouchers.RemoveRange(expiredVouchers);
+                await _db.SaveChangesAsync();
+            }
+
+            //Return vouchers
+            var activeVouchers = userVouchers.Where(v => v.ExpirationDate >= DateTime.UtcNow).ToList();
+
+            return Ok(activeVouchers);
+        }
+        [HttpGet("Get-ResturantsAndPoints")]
+        public IActionResult ResturantsAndPoints()
+        {
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userName == null)
+            {
+                return Unauthorized(); // User is not logged in
+            }
+            var user = _db.Users.FirstOrDefault(u => u.UserName == userName);
+
+            var ResturantsPoints = _db.Points.FirstOrDefault(p => p.UserId==user.Id);
+
+            if (ResturantsPoints == null)
+            {
+                return BadRequest("Try to review restaurants first");
+
+            }
+            return Ok(new
+            {
+                ResturantsPoints.Restaurant.Name,
+                ResturantsPoints.PointsForEachRestaurant,
+
+            });
+
+        }
+
+
+
 
     }
 }

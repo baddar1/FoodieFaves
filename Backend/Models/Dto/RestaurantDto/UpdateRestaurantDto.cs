@@ -12,16 +12,17 @@ namespace FF.Models.Dto.RestaurantDto
     public class UpdateRestaurantDto
     {
         [DisplayName("Restaurnat Number")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
         [DisplayName("Phone Number")]
         [MaxLength(10)]
-        public string phoneNumber { get; set; }
+        public string? phoneNumber { get; set; }
         [EmailAddress]
-        public string Email { get; set; }
-        public string Location { get; set; }
-        public List<string> Cuisine { get; set; }
+        public string? Email { get; set; }
+        public string? Location { get; set; }
+        public List<string>? Cuisine { get; set; }
         public double Budget { get; set; }
-        public string ImgUrl { get; set; }
+        public string? ImgUrl { get; set; }
+        public string? LogoImg { get; set; }
         public string? LiveSite { get; set; }
         public string? Open { get; set; }
         public string? Close { get; set; }

@@ -4,6 +4,7 @@ using FF.Data.Access.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FF.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241214210532_EditVoucher")]
+    partial class EditVoucher
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,7 +32,7 @@ namespace FF.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Admins", (string)null);
+                    b.ToTable("Admins");
                 });
 
             modelBuilder.Entity("FF.Models.FavoriteBlogger", b =>
@@ -49,7 +52,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("RestaurantId");
 
-                    b.ToTable("FavoriteBloggers", (string)null);
+                    b.ToTable("FavoriteBloggers");
                 });
 
             modelBuilder.Entity("FF.Models.FavoriteRestaurants", b =>
@@ -64,7 +67,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("RestaurantId");
 
-                    b.ToTable("FavoriteRestaurants", (string)null);
+                    b.ToTable("FavoriteRestaurants");
                 });
 
             modelBuilder.Entity("FF.Models.Like", b =>
@@ -91,7 +94,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Likes", (string)null);
+                    b.ToTable("Likes");
                 });
 
             modelBuilder.Entity("FF.Models.Notification", b =>
@@ -135,7 +138,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notifications", (string)null);
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("FF.Models.Order", b =>
@@ -170,13 +173,11 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("RestaurantId");
 
-                    b.HasIndex("ReviewId")
-                        .IsUnique()
-                        .HasFilter("[ReviewId] IS NOT NULL");
+                    b.HasIndex("ReviewId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("FF.Models.PendingUser", b =>
@@ -215,7 +216,7 @@ namespace FF.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PendingUsers", (string)null);
+                    b.ToTable("PendingUsers");
                 });
 
             modelBuilder.Entity("FF.Models.Points", b =>
@@ -245,7 +246,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Points", (string)null);
+                    b.ToTable("Points");
                 });
 
             modelBuilder.Entity("FF.Models.Restaurant", b =>
@@ -314,7 +315,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("AdminId");
 
-                    b.ToTable("Restaurants", (string)null);
+                    b.ToTable("Restaurants");
 
                     b.HasData(
                         new
@@ -414,11 +415,13 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("AdminId");
 
+                    b.HasIndex("OrderId");
+
                     b.HasIndex("RestaurantId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Reviews", (string)null);
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("FF.Models.Secuirty.ApplicationUser", b =>
@@ -497,7 +500,7 @@ namespace FF.Data.Migrations
                     b.Property<int>("RestaurantId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ReviewId")
+                    b.Property<int>("ReviewId")
                         .HasColumnType("int");
 
                     b.Property<double>("TopRate")
@@ -515,7 +518,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("TopReviewForUsers", (string)null);
+                    b.ToTable("TopReviewForUsers");
                 });
 
             modelBuilder.Entity("FF.Models.User", b =>
@@ -553,7 +556,7 @@ namespace FF.Data.Migrations
                     b.Property<double?>("TopRateReview")
                         .HasColumnType("float");
 
-                    b.Property<int?>("TotalLikes")
+                    b.Property<int>("TotalLikes")
                         .HasColumnType("int");
 
                     b.Property<int?>("TotalPoints")
@@ -572,7 +575,7 @@ namespace FF.Data.Migrations
                         .IsUnique()
                         .HasFilter("[ApplicationUserId] IS NOT NULL");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("FF.Models.Vouchers", b =>
@@ -613,7 +616,7 @@ namespace FF.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Vouchers", (string)null);
+                    b.ToTable("Vouchers");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -764,7 +767,7 @@ namespace FF.Data.Migrations
                     b.HasOne("FF.Models.User", "User")
                         .WithMany("FavoriteBloggers")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Blogger");
@@ -777,13 +780,13 @@ namespace FF.Data.Migrations
                     b.HasOne("FF.Models.Restaurant", "Restaurant")
                         .WithMany("FavoriteRestaurants")
                         .HasForeignKey("RestaurantId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("FF.Models.User", "User")
                         .WithMany("FavoriteRestaurants")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Restaurant");
@@ -836,9 +839,8 @@ namespace FF.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("FF.Models.Review", "ReviewNav")
-                        .WithOne("OrderNav")
-                        .HasForeignKey("FF.Models.Order", "ReviewId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .WithMany()
+                        .HasForeignKey("ReviewId");
 
                     b.HasOne("FF.Models.User", "UserNav")
                         .WithMany()
@@ -885,19 +887,25 @@ namespace FF.Data.Migrations
                         .WithMany("ManageReviews")
                         .HasForeignKey("AdminId");
 
+                    b.HasOne("FF.Models.Order", "OrderNav")
+                        .WithMany()
+                        .HasForeignKey("OrderId");
+
                     b.HasOne("FF.Models.Restaurant", "RestaurantNav")
                         .WithMany("ReviweNav")
                         .HasForeignKey("RestaurantId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("FF.Models.User", "UserNav")
                         .WithMany("Reviews")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("AdminNav");
+
+                    b.Navigation("OrderNav");
 
                     b.Navigation("RestaurantNav");
 
@@ -909,18 +917,19 @@ namespace FF.Data.Migrations
                     b.HasOne("FF.Models.Restaurant", "RestaurantNav")
                         .WithMany("TopReviews")
                         .HasForeignKey("RestaurantId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("FF.Models.Review", "ReviewNav")
                         .WithMany("TopReviews")
                         .HasForeignKey("ReviewId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("FF.Models.User", "UserNav")
                         .WithMany("TopReviews")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("RestaurantNav");
@@ -1042,8 +1051,6 @@ namespace FF.Data.Migrations
             modelBuilder.Entity("FF.Models.Review", b =>
                 {
                     b.Navigation("LikesNav");
-
-                    b.Navigation("OrderNav");
 
                     b.Navigation("TopReviews");
                 });

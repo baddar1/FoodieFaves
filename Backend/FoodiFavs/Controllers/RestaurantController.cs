@@ -153,7 +153,7 @@ namespace FoodiFavs.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpDelete("DeleteRestaurant-ById ")]
-        [Authorize(Roles ="Admin")]
+        //[Authorize(Roles ="Admin")]
         public IActionResult DeleteRestaurant(int Id)
         {
 
@@ -175,7 +175,7 @@ namespace FoodiFavs.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPut("UpadteRestaurant-ById")]
-        [Authorize(Roles ="Admin")]
+        //[Authorize(Roles ="Admin")]
         public IActionResult UpdateRestaurant(int Id,[FromBody]UpdateRestaurantDto obj)
         {
   
@@ -193,6 +193,7 @@ namespace FoodiFavs.Controllers
             Restaurant.Email = obj.Email;
             Restaurant.Budget = obj.Budget;
             Restaurant.ImgUrl = obj.ImgUrl;
+            Restaurant.LogoImg=obj.LogoImg;
             Restaurant.LiveSite=obj.LiveSite;
             Restaurant.Open=obj.Open;
             Restaurant.Close=obj.Close;
@@ -243,37 +244,47 @@ namespace FoodiFavs.Controllers
             return Ok(results);
         }
         [HttpGet("Filter-By-Cuisine-Budget")]
-        public async Task<IActionResult> Filter([FromQuery] List<string>? cuisine, [FromQuery] string? budget)
+        public async Task<IActionResult> Filter([FromQuery] List<string>? cuisine,[FromQuery] string? budget,[FromQuery] int? rating)
         {
             var query = _db.Restaurants.AsQueryable();
 
-            // Filter restaurants based on cuisine
-            if (cuisine != null && cuisine.Count() > 0)
+            // Filter by cuisine
+            if (cuisine != null && cuisine.Count > 0)
             {
                 query = query.Where(r => r.Cuisine.Any(c => cuisine.Contains(c)));
             }
 
-
-            // Filter restaurants based on budget
+            // Filter by budget
             if (!string.IsNullOrEmpty(budget))
             {
                 switch (budget.ToLower())
                 {
                     case "low":
-                        query = query.Where(r => r.Budget >= 1 && r.Budget < 5); // Assuming "low" budget is between 1 and 5
+                        query = query.Where(r => r.Budget >= 1 && r.Budget < 5);
                         break;
                     case "mid":
-                        query = query.Where(r => r.Budget >= 5 && r.Budget < 10); // "mid" budget is between 5 and 10
+                        query = query.Where(r => r.Budget >= 5 && r.Budget < 10);
                         break;
                     case "high":
-                        query = query.Where(r => r.Budget >= 10); // "high" budget is 10 and above
+                        query = query.Where(r => r.Budget >= 10);
                         break;
                     default:
                         return BadRequest("Invalid budget filter. Use 'low', 'mid', or 'high'.");
                 }
             }
 
-            // Bring data into memory for sorting
+            // Filter by rating
+            if (rating.HasValue)
+            {
+                if (rating < 1 || rating > 5)
+                {
+                    return BadRequest("Rating must be between 1 and 5.");
+                }
+
+                query = query.Where(r => r.Rating>=rating);
+            }
+
+            // Fetch and sort the data
             var sortedRestaurants = await query
                 .Select(r => new
                 {
@@ -285,24 +296,11 @@ namespace FoodiFavs.Controllers
                     r.Location,
                     r.ImgUrl
                 })
-                .ToListAsync();
-
-            // Filter and sort data
-            if (cuisine != null && cuisine.Count() > 0)
-            {
-                sortedRestaurants = sortedRestaurants
-                    .Where(r => r.Cuisine.Any(c => cuisine.Contains(c)))
-                    .ToList();
-            }
-
-
-            // Sorting restaurants by Budget and then by Cuisine 
-            sortedRestaurants = sortedRestaurants
                 .OrderBy(r => r.Budget)
                 .ThenBy(r => string.Join(", ", r.Cuisine))
-                .ToList();
+                .ToListAsync();
 
-            // If no results found
+            // Return 404 if no results
             if (!sortedRestaurants.Any())
             {
                 return NotFound("No restaurants found matching the given criteria.");
@@ -310,6 +308,7 @@ namespace FoodiFavs.Controllers
 
             return Ok(sortedRestaurants);
         }
+
         [HttpGet("SorteRestaurantByRating")]
         public async Task<IActionResult> SorteRestaurantByRating()
         {

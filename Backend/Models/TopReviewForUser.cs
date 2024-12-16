@@ -19,10 +19,10 @@ namespace FF.Models
         [ValidateNever]
         public User UserNav { get; set; }
 
-        public int ReviewId { get; set; }
+        public int? ReviewId { get; set; }
         [ForeignKey(nameof(ReviewId))]
         [ValidateNever]
-        public Review ReviewNav { get; set; }
+        public Review? ReviewNav { get; set; }
 
         public int RestaurantId { get; set; }
         [ForeignKey(nameof(RestaurantId))]

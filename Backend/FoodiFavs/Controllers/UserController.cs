@@ -79,6 +79,8 @@ namespace FoodiFavs.Controllers
                 .Include(fr => fr.Restaurant) 
                 .Select(fr => new
                 {
+                    fr.Restaurant.Id,
+                    fr.Restaurant.ReviewCount,
                     fr.Restaurant.Name,    
                     fr.Restaurant.Open,
                     fr.Restaurant.Close,
@@ -173,7 +175,9 @@ namespace FoodiFavs.Controllers
                             tr.ReviewId,
                             tr.ReviewNav.Comment,
                             tr.ReviewNav.Rating,
-                            tr.ReviewNav.CreatedAt
+                            tr.ReviewNav.CreatedAt,
+                            tr.ReviewNav.Likes,
+                            
                         }).FirstOrDefault(),
 
                     // Select the restaurant info
@@ -300,39 +304,54 @@ namespace FoodiFavs.Controllers
         {
             var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = _db.Users.FirstOrDefault(u => u.UserName == userName);
-            if (user.Id==null) 
+            if (user==null) 
             {
                 return BadRequest();
             }
-             var userReviews = _db.Users
-                .Where(u => u.Id==user.Id)
-                .Select(u => new
-                {
-                    u.Id,
-                    u.UserName,
-                    u.ReviewCount,
-                    u.TotalLikes,
-                    u.TotalPoints,
-                    u.ImgUrl,
-                    Reviews = u.Reviews.Select(review => new
-                    {
-                        review.Id,
-                        review.RestaurantNav.Name,
-                        review.RestaurantNav.ImgUrl,
-                        review.Rating,
-                        review.Comment,
-                        review.CreatedAt,
-                        review.Likes,
+            var reviews = _db.Reviews.FirstOrDefault(r => r.UserId==user.Id);
+            if (reviews == null)
+            {
+                var userReviews = _db.Users
+               .Where(u => u.Id==user.Id)
+               .Select(u => new
+               {
+                   u.Id,
+                   u.UserName,
+                   u.ReviewCount,
+                   u.TotalLikes,
+                   u.TotalPoints,
+                   u.ImgUrl,
+               }).ToList();
+                return Ok(userReviews);
+            }
+            else
+            {
+                var userReviews = _db.Users
+                   .Where(u => u.Id==user.Id)
+                   .Select(u => new
+                   {
+                       u.Id,
+                       u.UserName,
+                       u.ReviewCount,
+                       u.TotalLikes,
+                       u.TotalPoints,
+                       u.ImgUrl,
+                       Reviews = u.Reviews.Select(review => new
+                       {
+                           review.Id,
+                           review.RestaurantId,
+                           review.RestaurantNav.Name,
+                           review.RestaurantNav.ImgUrl,
+                           review.Rating,
+                           review.Comment,
+                           review.CreatedAt,
+                           review.Likes,
 
-                    }).ToList()
-                }).FirstOrDefault();
-
-            if (userReviews == null)
-                return NotFound();
-
-            return Ok(userReviews);
-
-
+                       }).ToList()
+                   }).FirstOrDefault();
+                return Ok(userReviews);
+            }
+            
         }
         [HttpPost("upload-Users-images")]
         public async Task<IActionResult> UploadUserImage(IFormFile file)
@@ -377,6 +396,47 @@ namespace FoodiFavs.Controllers
 
             return Ok(new { ImageUrl = relativePath });
         }
+        [HttpGet("Get-User-Reviews-ById")]
+        public IActionResult GetUserReviews(string Id)
+        {
+
+            var user = _db.Users.FirstOrDefault(u => u.Id == Id);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+            var userReviews = _db.Users
+               .Where(u => u.Id==user.Id)
+               .Select(u => new
+               {
+                   u.Id,
+                   u.UserName,
+                   u.ReviewCount,
+                   u.TotalLikes,
+                   u.TotalPoints,
+                   u.ImgUrl,
+                   Reviews = u.Reviews.Select(review => new
+                   {
+                       review.Id,
+                       review.RestaurantId,
+                       review.RestaurantNav.Name,
+                       review.RestaurantNav.ImgUrl,
+                       review.Rating,
+                       review.Comment,
+                       review.CreatedAt,
+                       review.Likes,
+
+                   }).ToList()
+               }).FirstOrDefault();
+
+            if (userReviews == null)
+                return NotFound();
+
+            return Ok(userReviews);
+
+
+        }
+
 
 
     }
