@@ -243,15 +243,15 @@ namespace FoodiFavs.Controllers
 
             return Ok(results);
         }
-        [HttpGet("Filter-By-Cuisine-Budget")]
-        public async Task<IActionResult> Filter([FromQuery] List<string>? cuisine,[FromQuery] string? budget,[FromQuery] int? rating)
+        [HttpGet("Filter-By-Cuisine-Budget-Rating")]
+        public async Task<IActionResult> Filter([FromQuery] List<string>? cuisine, [FromQuery] string? budget, [FromQuery] int? rating)
         {
             var query = _db.Restaurants.AsQueryable();
 
             // Filter by cuisine
             if (cuisine != null && cuisine.Count > 0)
             {
-                query = query.Where(r => r.Cuisine.Any(c => cuisine.Contains(c)));
+                query = query.Where(r => r.Cuisine.Count == cuisine.Count && r.Cuisine.All(c => cuisine.Contains(c)));
             }
 
             // Filter by budget
@@ -281,11 +281,11 @@ namespace FoodiFavs.Controllers
                     return BadRequest("Rating must be between 1 and 5.");
                 }
 
-                query = query.Where(r => r.Rating>=rating);
+                query = query.Where(r => r.Rating >= rating);
             }
 
-            // Fetch and sort the data
-            var sortedRestaurants = await query
+            // Fetch data from the database
+            var restaurants = await query
                 .Select(r => new
                 {
                     r.Id,
@@ -296,19 +296,16 @@ namespace FoodiFavs.Controllers
                     r.Location,
                     r.ImgUrl
                 })
-                .OrderBy(r => r.Budget)
-                .ThenBy(r => string.Join(", ", r.Cuisine))
                 .ToListAsync();
 
             // Return 404 if no results
-            if (!sortedRestaurants.Any())
+            if (!restaurants.Any())
             {
                 return NotFound("No restaurants found matching the given criteria.");
             }
 
-            return Ok(sortedRestaurants);
+            return Ok(restaurants);
         }
-
         [HttpGet("SorteRestaurantByRating")]
         public async Task<IActionResult> SorteRestaurantByRating()
         {

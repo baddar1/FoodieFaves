@@ -322,7 +322,7 @@ namespace FoodiFavs.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPut("UpadteReview-ById")]
-        [Authorize(Roles ="Admin")]
+        //[Authorize(Roles ="Admin")]
         public IActionResult UpdateReview(int Id, [FromBody] ReviewDto obj)
         {
 
@@ -347,8 +347,13 @@ namespace FoodiFavs.Controllers
                 return Unauthorized(); // Return 401 if user is not logged in
             }
             var user = _db.Users.FirstOrDefault(u => u.UserName == userId);
-            var existingLike = _db.Likes.FirstOrDefault((l => l.UserId == user.Id && l.ReviewId == ReviewId));
+         
             var Review = _db.Reviews.FirstOrDefault(r => r.Id == ReviewId);
+            if (Review == null) 
+            {
+                return BadRequest("No Review with this Id");
+            }
+            var existingLike = _db.Likes.FirstOrDefault((l => l.ReviewId == ReviewId));
             var reviewer = _db.Users.FirstOrDefault(u => u.Id == Review.UserId);
             if (existingLike == null)
             {
@@ -361,7 +366,6 @@ namespace FoodiFavs.Controllers
 
                 Review.Likes++;
 
-               
                 if (reviewer != null)
                 {
                     reviewer.TotalLikes++;
