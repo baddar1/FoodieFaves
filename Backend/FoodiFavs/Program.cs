@@ -68,6 +68,11 @@ builder.Services.AddCors(corsOption => {
     });
 });
 builder.Services.AddDbContext<ApplicationDbContext>(OptionsBuilder => OptionsBuilder.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+    options.EnableSensitiveDataLogging(); // Enable this for debugging
+});
+
 
 // builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>();
 var app = builder.Build();

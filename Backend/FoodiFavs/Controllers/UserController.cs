@@ -342,6 +342,7 @@ namespace FoodiFavs.Controllers
                            review.RestaurantId,
                            review.RestaurantNav.Name,
                            review.RestaurantNav.ImgUrl,
+                           review.RestaurantNav.Location,
                            review.Rating,
                            review.Comment,
                            review.CreatedAt,
@@ -436,6 +437,28 @@ namespace FoodiFavs.Controllers
 
 
         }
+        [HttpGet("Reviews-ILiked")]
+        public IActionResult GetUserLikedReviews()
+        {
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userName == null)
+            {
+                return Unauthorized(); // Return 401 if user is not logged in
+            }
+            var user = _db.Users.FirstOrDefault(u => u.UserName == userName);
+            var likedReviews = _db.Likes
+               .Where(l => l.UserId == user.Id)
+               .Select(l => new
+               {
+                   ReviewId=l.ReviewId
+               });
+            if (likedReviews==null)
+            {
+                return BadRequest("No Liked Review");
+            }
+            return Ok(likedReviews);
+
+       }
 
 
 
