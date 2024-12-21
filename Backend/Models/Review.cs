@@ -48,6 +48,8 @@ namespace FF.Models
         [ValidateNever]
         public Admin? AdminNav { get; set; }
         public ICollection<Like>? LikesNav { get; set; }
+        public ICollection<Notification>? NotificationNav { get; set; }
+
 
     }
 }

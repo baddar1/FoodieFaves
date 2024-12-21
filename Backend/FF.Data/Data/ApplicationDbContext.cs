@@ -34,40 +34,51 @@ namespace FF.Data.Access.Data
                .HasOne(o => o.ReviewNav)
                .WithOne(r => r.OrderNav)
                .HasForeignKey<Order>(o => o.ReviewId)
-                .OnDelete(DeleteBehavior.NoAction);
+               .OnDelete(DeleteBehavior.NoAction);
 
             builder.Entity<Restaurant>()
                    .HasMany(r => r.ReviweNav)
                    .WithOne(r => r.RestaurantNav)
                    .HasForeignKey(r => r.RestaurantId)
-                    .OnDelete(DeleteBehavior.NoAction);
+                   .OnDelete(DeleteBehavior.NoAction);
 
+            builder.Entity<Like>()
+                .HasOne(l => l.Review)
+                .WithMany(r => r.LikesNav)
+                .HasForeignKey(l => l.ReviewId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<Notification>()
+                .HasOne(n => n.ReviewNav)
+                .WithMany(r => r.NotificationNav)
+                .HasForeignKey(n => n.ReviewId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             // Configure one-to-many relationship between User and Review
             builder.Entity<User>()
                    .HasMany(u => u.Reviews)
                    .WithOne(r => r.UserNav)
                    .HasForeignKey(r => r.UserId)
-                    .OnDelete(DeleteBehavior.NoAction);
+                   .OnDelete(DeleteBehavior.NoAction);
             // Configure relationship between User and TopReviewForUser
             builder.Entity<TopReviewForUser>()
                 .HasOne(tr => tr.UserNav)
                 .WithMany(u => u.TopReviews)
                 .HasForeignKey(tr => tr.UserId)
-               .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.NoAction);
 
             // Configure relationship between Review and TopReviewForUser
             builder.Entity<TopReviewForUser>()
                 .HasOne(tr => tr.ReviewNav)
                 .WithMany(r => r.TopReviews)
                 .HasForeignKey(tr => tr.ReviewId)
-                 .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.NoAction);
             // Relationship: Restaurant -> TopReviewForUser
             builder.Entity<TopReviewForUser>()
                 .HasOne(tr => tr.RestaurantNav)
                 .WithMany(r => r.TopReviews)
                 .HasForeignKey(tr => tr.RestaurantId)
-                 .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.NoAction);
 
 
             builder.Entity<Restaurant>().HasData(

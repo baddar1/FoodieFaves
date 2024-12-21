@@ -281,19 +281,38 @@ namespace FoodiFavs.Controllers
             var TopRate = _db.TopReviewForUsers.FirstOrDefault(u => u.UserId==userId);
             var points = _db.Points.FirstOrDefault(p => p.UserId==userId);
             var restaurants = _db.Restaurants.FirstOrDefault(r => r.Id==Review.RestaurantId);
-            var notification=_db.Notifications.FirstOrDefault(n => n.UserId==userId && n.ReviewId==Review.Id);
+            var notifications = _db.Notifications.Where(n => n.ReviewId == Review.Id).ToList();
             var order=_db.Orders.FirstOrDefault(o => o.ReviewId==Review.Id);
+            var likes = _db.Likes.Where(l => l.ReviewId == Review.Id).ToList();
 
-            _db.Orders.Remove(order);
-            _db.Notifications.Remove(notification);
-            
+
+            if (order!=null) 
+            {
+                _db.Orders.Remove(order);
+            }
+            if (likes.Any())
+            {
+                _db.Likes.RemoveRange(likes);
+            }
+            if (notifications.Any())
+            {
+                _db.Notifications.RemoveRange(notifications); 
+            }
+
             _db.Reviews.Remove(Review);
+  
             _db.SaveChanges();
 
-            
-            restaurants.ReviewCount--;
-            points.PointsForEachRestaurant-=5;
-            points.AllPoints-=5;
+            if (restaurants!=null) 
+            {
+                restaurants.ReviewCount--;
+            }
+            if (points!=null) 
+            {
+                points.PointsForEachRestaurant-=5;
+                points.AllPoints-=5;
+            }
+           
             user.TotalLikes-=Review.Likes;
             user.TotalPoints-=5;
             Review.UserNav.ReviewCount--;
@@ -353,7 +372,7 @@ namespace FoodiFavs.Controllers
             {
                 return BadRequest("No Review with this Id");
             }
-            var existingLike = _db.Likes.FirstOrDefault((l => l.ReviewId == ReviewId));
+            var existingLike = _db.Likes.FirstOrDefault((l => l.ReviewId == ReviewId && l.UserId==user.Id));
             var reviewer = _db.Users.FirstOrDefault(u => u.Id == Review.UserId);
             if (existingLike == null)
             {
@@ -381,7 +400,9 @@ namespace FoodiFavs.Controllers
                         CreatedAt = DateTime.UtcNow,
                         IsRead = false,
                         ReviewId=ReviewId,
-                        NotificationType="Like"
+                        NotificationType="Like",
+                        RestaurantId=Review.RestaurantId
+                        
                     };
                     _db.Notifications.Add(notification);
                 }
