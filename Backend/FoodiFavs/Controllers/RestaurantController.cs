@@ -251,7 +251,8 @@ namespace FoodiFavs.Controllers
             // Filter by cuisine
             if (cuisine != null && cuisine.Count > 0)
             {
-                query = query.Where(r => r.Cuisine.Count == cuisine.Count && r.Cuisine.All(c => cuisine.Contains(c)));
+                // Search for restaurants that have any of the cuisines selected by the user
+                query = query.Where(r => r.Cuisine.Any(c => cuisine.Contains(c)));
             }
 
             // Filter by budget
@@ -290,11 +291,16 @@ namespace FoodiFavs.Controllers
                 {
                     r.Id,
                     r.Name,
+                    r.phoneNumber,
                     r.Rating,
                     r.Cuisine,
+                    r.ReviewCount,
                     r.Budget,
                     r.Location,
-                    r.ImgUrl
+                    r.ImgUrl,
+                    r.Open,
+                    r.Close,
+                    r.Description
                 })
                 .ToListAsync();
 
@@ -306,6 +312,7 @@ namespace FoodiFavs.Controllers
 
             return Ok(restaurants);
         }
+
         [HttpGet("SorteRestaurantByRating")]
         public async Task<IActionResult> SorteRestaurantByRating()
         {
