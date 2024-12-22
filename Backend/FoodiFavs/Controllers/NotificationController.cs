@@ -38,18 +38,17 @@ namespace FoodiFavs.Controllers
                 .OrderByDescending(n => n.CreatedAt) 
                 .Select(n => new
                 {
-                    //n.Id,
                     n.Message,
                     n.CreatedAt,
-                    //n.IsRead,
-                    //n.ReviewId 
                 })
                 .ToListAsync();
 
             if (!notifications.Any())
             {
-                return NotFound("No notifications found for the user.");
+                return NotFound("No notifications yet.");
             }
+            user.UnReadNotiNum=0;
+            _db.SaveChanges();
 
             return Ok(notifications); 
         }
