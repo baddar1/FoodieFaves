@@ -413,7 +413,6 @@ namespace FoodiFavs.Controllers
                 _db.Likes.Remove(existingLike);
                 Review.Likes--;
                 reviewer.TotalLikes--;
-                user.TotalLikes--;
                 var notification = _db.Notifications
                 .FirstOrDefault(n => n.UserId == Review.UserId
                  && n.Message == $"{user.UserName} liked your review.");
