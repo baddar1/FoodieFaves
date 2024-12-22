@@ -107,8 +107,8 @@ namespace FoodiFavs.Controllers
                 IsRead = false,
                 RestaurantId = restaurantId,
                 NotificationType="Voucher",
-
             };
+            user.UnReadNotiNum++;
             _db.Notifications.Add(notification);
             _db.Vouchers.Add(SetVoucher);
             _db.SaveChanges();

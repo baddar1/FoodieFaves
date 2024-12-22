@@ -56,6 +56,7 @@ namespace FoodiFavs.Controllers
                 };
                 _db.FavoriteRestaurants.Add(Favorite);
                 notification.Message=$"{restaurant.Name} is add to your favorite restaurants list";
+                user.UnReadNotiNum++;
                 _db.Notifications.Add(notification);
                 _db.SaveChanges();
                 return Ok(notification.Message);
@@ -141,12 +142,15 @@ namespace FoodiFavs.Controllers
                     BloggertId = BloggerId,
                     NotificationType="Favorite Blogger"
                 };
+            blogger.UnReadNotiNum = blogger.UnReadNotiNum ?? 0;
+            blogger.UnReadNotiNum++;
 
+            user.UnReadNotiNum++;
                 _db.Notifications.Add(notification);
                 _db.SaveChanges();
 
                 return Ok($"{blogger.UserName} has been successfully added to your favorites list!");
-            
+                
         }
         [HttpGet("Get-Favorite-Bloggers")]
         public async Task<IActionResult> GetFavoriteBloggers()
