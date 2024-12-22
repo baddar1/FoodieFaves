@@ -143,7 +143,7 @@ namespace FoodiFavs.Controllers
 
                 //To count reviews number for each user
                 user.ReviewCount++;
-                user.TotalPoints+=5;
+                user.TotalPoints+=50;
                 restaurant.ReviewCount++;
 
                 await _db.SaveChangesAsync();
@@ -199,7 +199,7 @@ namespace FoodiFavs.Controllers
             else
             {
                 // If points already exist, update the points
-                userRestaurantPoints.PointsForEachRestaurant += 5;
+                userRestaurantPoints.PointsForEachRestaurant += 50;
                 
                 notification.Message = $"{user.UserName} You've earned 5 points for your contribution y!";
                 notification.ReviewId=model.Id;
@@ -376,7 +376,7 @@ namespace FoodiFavs.Controllers
             var reviewer = _db.Users.FirstOrDefault(u => u.Id == Review.UserId);
             if (reviewer == null) 
             {
-                return BadRequest("Sign up First");
+                return BadRequest("Sign Up First");
             }
             if (existingLike == null)
             {
@@ -416,10 +416,13 @@ namespace FoodiFavs.Controllers
             {
                 _db.Likes.Remove(existingLike);
                 Review.Likes--;
-                reviewer.TotalLikes--;
-                if (reviewer.TotalLikes < 0) 
+                if (reviewer.UserName==user.UserName)
                 {
-                    reviewer.TotalLikes = 0;
+                    user.TotalLikes--;
+                }
+                else
+                {
+                    reviewer.TotalLikes--;
                 }
                 var notification = _db.Notifications
                 .FirstOrDefault(n => n.UserId == Review.UserId
