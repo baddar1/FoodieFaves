@@ -374,6 +374,10 @@ namespace FoodiFavs.Controllers
             }
             var existingLike = _db.Likes.FirstOrDefault((l => l.ReviewId == ReviewId && l.UserId==user.Id));
             var reviewer = _db.Users.FirstOrDefault(u => u.Id == Review.UserId);
+            if (reviewer == null) 
+            {
+                return BadRequest("Sign up First");
+            }
             if (existingLike == null)
             {
                 var Like = new Like
@@ -413,6 +417,10 @@ namespace FoodiFavs.Controllers
                 _db.Likes.Remove(existingLike);
                 Review.Likes--;
                 reviewer.TotalLikes--;
+                if (reviewer.TotalLikes < 0) 
+                {
+                    reviewer.TotalLikes = 0;
+                }
                 var notification = _db.Notifications
                 .FirstOrDefault(n => n.UserId == Review.UserId
                  && n.Message == $"{user.UserName} liked your review.");
