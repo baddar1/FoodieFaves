@@ -143,7 +143,7 @@ namespace FoodiFavs.Controllers
 
                 //To count reviews number for each user
                 user.ReviewCount++;
-                user.TotalPoints+=5;
+                user.TotalPoints+=50;
                 restaurant.ReviewCount++;
 
                 await _db.SaveChangesAsync();
@@ -199,7 +199,7 @@ namespace FoodiFavs.Controllers
             else
             {
                 // If points already exist, update the points
-                userRestaurantPoints.PointsForEachRestaurant += 5;
+                userRestaurantPoints.PointsForEachRestaurant += 50;
                 
                 notification.Message = $"{user.UserName} You've earned 5 points for your contribution y!";
                 notification.ReviewId=model.Id;
@@ -219,7 +219,8 @@ namespace FoodiFavs.Controllers
                 }
             }
             userRestaurantPoints.AllPoints=user.TotalPoints;
-            
+            user.UnReadNotiNum = user.UnReadNotiNum ?? 0;
+            user.UnReadNotiNum++;
             _db.Notifications.Add(notification);
             await _db.SaveChangesAsync();
  
@@ -235,23 +236,25 @@ namespace FoodiFavs.Controllers
             //Find all the Users whose following the blogger 
             var followers = _db.FavoriteBloggers
                .Where(f => f.BloggerId == user.Id) //Make suer that we search in the same blogger
-               .Select(f => f.UserId) //Get the followers Id
+               .Select(f => f.User) //Get the followers Id
                .ToList();
 
             //Loob to notify to all Followers
-            foreach (var followerId in followers)
+            foreach (var follower in followers)
             {
                 var notificationReview = new Notification
                 {
-                    UserId = followerId, 
-                    Message = $"{user.UserName}, your favorite blogger, has written a new review for {restaurant.Name}!",
+                    UserId = follower.Id, 
+                    Message = $"your favorite blogger {user.UserName} , has written a new review for {restaurant.Name}!",
                     CreatedAt = DateTime.Now,
                     IsRead = false,
-                    //BloggertId= followerId,
+                    BloggertId= follower.Id,
                     ReviewId=model.Id,
                     RestaurantId=restaurant.Id,
-                    NotificationType="Review"
+                    NotificationType="Review",
                 };
+                follower.UnReadNotiNum = follower.UnReadNotiNum ?? 0;
+                follower.UnReadNotiNum++;
                 _db.Notifications.Add(notificationReview);
             }
             await _db.SaveChangesAsync();
@@ -376,7 +379,7 @@ namespace FoodiFavs.Controllers
             var reviewer = _db.Users.FirstOrDefault(u => u.Id == Review.UserId);
             if (reviewer == null) 
             {
-                return BadRequest("Sign up First");
+                return BadRequest("Sign Up First");
             }
             if (existingLike == null)
             {
@@ -408,6 +411,7 @@ namespace FoodiFavs.Controllers
                         RestaurantId=Review.RestaurantId
                         
                     };
+                    user.UnReadNotiNum++;
                     _db.Notifications.Add(notification);
                 }
 
@@ -416,10 +420,13 @@ namespace FoodiFavs.Controllers
             {
                 _db.Likes.Remove(existingLike);
                 Review.Likes--;
-                user.TotalLikes--;
-                if (user.TotalLikes < 0)
+                if (reviewer.UserName==user.UserName)
                 {
-                    user.TotalLikes = 0;
+                    user.TotalLikes--;
+                }
+                else
+                {
+                    reviewer.TotalLikes--;
                 }
                 var notification = _db.Notifications
                 .FirstOrDefault(n => n.UserId == Review.UserId

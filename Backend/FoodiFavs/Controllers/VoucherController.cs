@@ -32,7 +32,11 @@ namespace FoodiFavs.Controllers
             {
                 return Unauthorized(); // Return 401 if user is not logged in
             }
-
+            var restaurant = _db.Restaurants.FirstOrDefault(r => r.Id==restaurantId);
+            if (restaurant == null) 
+            {
+                return BadRequest($"{restaurant.Name} is out of service");
+            }
             var RestaurantPoints = _db.Points.FirstOrDefault(p => p.UserId==user.Id && p.RestaurantId==restaurantId);
             if (RestaurantPoints==null)
             {
@@ -50,13 +54,14 @@ namespace FoodiFavs.Controllers
                 }
                 SetVoucher = new Vouchers
                 {
-                    voucherType = "0.15 off",
+                    voucherType = "1 Jd",
                     UserId = user.Id,
                     RestaurantId = restaurantId,
                     CreatedAt = DateTime.UtcNow,
                     ExpirationDate = DateTime.UtcNow.AddDays(30),
                     voucherCode = formattedCode
                 };
+                
             }
             else if (points == 100)
             {
@@ -66,7 +71,7 @@ namespace FoodiFavs.Controllers
                 }
                 SetVoucher = new Vouchers
                 {
-                    voucherType = "2 JD",
+                    voucherType = "2.5 JD",
                     UserId = user.Id,
                     RestaurantId = restaurantId,
                     CreatedAt = DateTime.UtcNow,
@@ -82,7 +87,7 @@ namespace FoodiFavs.Controllers
                 }
                 SetVoucher = new Vouchers
                 {
-                    voucherType = "5 JD",
+                    voucherType = "6 JD",
                     UserId = user.Id,
                     RestaurantId = restaurantId,
                     CreatedAt = DateTime.UtcNow,
@@ -94,6 +99,17 @@ namespace FoodiFavs.Controllers
             {
                 return BadRequest("Please select a Voucher");
             }
+            var notification = new Notification
+            {
+                UserId = user.Id, // Notify the Blogger
+                Message = $"{user.UserName}, Enjoy your {SetVoucher.voucherType} off for your next order from {restaurant.Name} .",
+                CreatedAt = DateTime.UtcNow,
+                IsRead = false,
+                RestaurantId = restaurantId,
+                NotificationType="Voucher",
+            };
+            user.UnReadNotiNum++;
+            _db.Notifications.Add(notification);
             _db.Vouchers.Add(SetVoucher);
             _db.SaveChanges();
             user.TotalPoints-=points;
