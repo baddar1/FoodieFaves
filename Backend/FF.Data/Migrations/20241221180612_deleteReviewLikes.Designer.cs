@@ -4,6 +4,7 @@ using FF.Data.Access.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FF.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241221180612_deleteReviewLikes")]
+    partial class deleteReviewLikes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -559,9 +562,6 @@ namespace FF.Data.Migrations
                     b.Property<int?>("TotalPoints")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UnReadNotiNum")
-                        .HasColumnType("int");
-
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -816,9 +816,8 @@ namespace FF.Data.Migrations
             modelBuilder.Entity("FF.Models.Notification", b =>
                 {
                     b.HasOne("FF.Models.Review", "ReviewNav")
-                        .WithMany("NotificationNav")
-                        .HasForeignKey("ReviewId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .WithMany()
+                        .HasForeignKey("ReviewId");
 
                     b.HasOne("FF.Models.User", "UserNav")
                         .WithMany("Notifications")
@@ -1046,8 +1045,6 @@ namespace FF.Data.Migrations
             modelBuilder.Entity("FF.Models.Review", b =>
                 {
                     b.Navigation("LikesNav");
-
-                    b.Navigation("NotificationNav");
 
                     b.Navigation("OrderNav");
 
