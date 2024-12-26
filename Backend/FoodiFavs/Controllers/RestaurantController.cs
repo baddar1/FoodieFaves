@@ -147,6 +147,7 @@ namespace FoodiFavs.Controllers
 
             _db.Restaurants.Add(model);
             _db.SaveChanges();
+
             return Ok((new { model.Id }));
         }
         [ProducesResponseType(StatusCodes.Status204NoContent)]
