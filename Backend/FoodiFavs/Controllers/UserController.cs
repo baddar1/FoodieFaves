@@ -463,6 +463,22 @@ namespace FoodiFavs.Controllers
             return Ok(likedReviews);
 
        }
+        [HttpGet("user-count")]
+        public ActionResult<int> UserCount()
+        {
+            var UserCount = _db.Users.Select(u => u.Id).Count();
+            return UserCount;
+        }
+        [HttpGet("All-Users")]
+        public IActionResult GetAllUsers() 
+        {
+            var Users=_db.Users.ToList();
+            if (Users==null) 
+            {
+                return BadRequest("NO Users");
+            }
+            return Ok(Users);
+        }
 
 
 

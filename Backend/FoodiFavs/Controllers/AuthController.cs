@@ -58,22 +58,15 @@ namespace FoodiFavs.Controllers
 
             if (!ModelState.IsValid)
             {
-
                 return BadRequest(ModelState);
             }
-
-
             var result = await _authService.RegisterAsync(registerModel);
 
-
-            if (!result.IsAuthenticated)
+            if (result.Message != "Please check your email to confirm your identity.")
             {
-
                 return BadRequest(result.Message);
             }
-
-
-            return Ok(result);
+            return Ok(result.Message);
         }
         [HttpGet("confirm-email")]
         public async Task<IActionResult> ConfirmEmail(string code)
