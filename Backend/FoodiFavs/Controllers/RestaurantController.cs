@@ -407,9 +407,11 @@ namespace FoodiFavs.Controllers
 
             return Ok(new { ImageUrl = relativePath });
         }
-
-
-
-
+        [HttpGet("restaurant-count")]
+        public async Task<ActionResult<int>> GetReviewesNumber()
+        {
+            var RestaurantNumber = _db.Restaurants.Select(r => r.Id).Count();
+            return RestaurantNumber;
+        }
     }
 }

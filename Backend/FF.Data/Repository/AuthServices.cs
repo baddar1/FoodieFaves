@@ -68,11 +68,15 @@ namespace FF.Data.Repository
             _db.PendingUsers.Add(pendingUser);
             await _db.SaveChangesAsync();
 
-            var callbackUrl = $"https://localhost:7063/api/auth/confirm-email?code={confirmationCode}"; // Update with your actual URL
+            //var callbackUrl = $"https://localhost:7063/api/auth/confirm-email?code={confirmationCode}"; // Update with your actual URL
+            //await _emailSender.SendEmailAsync(model.Email, "Confirm your identity",
+            //    $"Please confirm your identity by clicking here: <a href='{callbackUrl}'>link</a>");
+
             await _emailSender.SendEmailAsync(model.Email, "Confirm your identity",
-                $"Please confirm your identity by clicking here: <a href='{callbackUrl}'>link</a>");
+             $"Please confirm your identity by this code : {confirmationCode}");
 
             return new AuthModel { Message = "Please check your email to confirm your identity." };
+
 
             //var result = await UserManager.CreateAsync(applicationUser, model.Password);
             
@@ -118,7 +122,7 @@ namespace FF.Data.Repository
         }
         public async Task<AuthModel> ConfirmEmailAsync(string code)
         {
-            if (code == null)
+            if (code == null || code.Length != 6)
             {
                 return new AuthModel {  Message = "Invalid confirmation code." };
             }

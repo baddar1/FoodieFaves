@@ -73,7 +73,7 @@ namespace FoodiFavs.Controllers
             {
                 return BadRequest("Review code is required.");
             }
-            
+
             var order = _db.Orders.FirstOrDefault(o => o.ReviewCode == reviewCode);
             if (order == null)
             {
@@ -91,10 +91,10 @@ namespace FoodiFavs.Controllers
             }
             order.UserId=user.Id;
             _db.SaveChanges();
-            return Ok(new 
+            return Ok(new
             {
-            restaurant.Id,
-            restaurant.Name,
+                restaurant.Id,
+                restaurant.Name,
             });
         }
         [HttpPost("Add-Review")]
@@ -110,8 +110,8 @@ namespace FoodiFavs.Controllers
             }
 
             var restaurant = await _db.Restaurants.FirstOrDefaultAsync(r => r.Id == obj.RestaurantId);
-            
-            if (restaurant == null) 
+
+            if (restaurant == null)
             {
                 return NotFound("Restaurant not found.");
             }
@@ -123,7 +123,7 @@ namespace FoodiFavs.Controllers
             var user = _db.Users.FirstOrDefault(u => u.UserName == userName);
             Review model = new()
             {
-                
+
                 Rating=obj.Rating,
                 Comment=obj.Comment,
                 UserId=user.Id,
@@ -143,7 +143,7 @@ namespace FoodiFavs.Controllers
 
                 //To count reviews number for each user
                 user.ReviewCount++;
-                user.TotalPoints+=50;
+                user.TotalPoints+=5;
                 restaurant.ReviewCount++;
 
                 await _db.SaveChangesAsync();
@@ -160,7 +160,7 @@ namespace FoodiFavs.Controllers
 
             var userRestaurantPoints = await _db.Points
             .FirstOrDefaultAsync(p => p.UserId == user.Id && p.RestaurantId == obj.RestaurantId);
-           
+
             var notification = new Notification
             {
                 UserId = user.Id,
@@ -170,7 +170,7 @@ namespace FoodiFavs.Controllers
                 NotificationType="Points"
 
             };
-            
+
             await _db.SaveChangesAsync();
 
             if (userRestaurantPoints == null)
@@ -188,7 +188,7 @@ namespace FoodiFavs.Controllers
                 user.TopRateReview=model.Rating;
                 TopReview.TopRate=model.Rating;
                 TopReview.RestaurantId=restaurant.Id;
-                
+
                 notification.Message = $"{user.UserName} Congratulations on posting your first review on {restaurant.Name} You've earned 5 points for your contribution!";
                 notification.ReviewId=model.Id;
                 notification.RestaurantId=model.RestaurantId;
@@ -199,15 +199,15 @@ namespace FoodiFavs.Controllers
             else
             {
                 // If points already exist, update the points
-                userRestaurantPoints.PointsForEachRestaurant += 50;
-                
-                notification.Message = $"{user.UserName} You've earned 5 points for your contribution y!";
+                userRestaurantPoints.PointsForEachRestaurant += 5;
+
+                notification.Message = $"{user.UserName} You've earned 5 points on {restaurant.Name} for your contribution y!";
                 notification.ReviewId=model.Id;
                 notification.RestaurantId=model.RestaurantId;
                 //To find top review for each user
                 var existingTopReview = _db.TopReviewForUsers.FirstOrDefault(tr => tr.UserId == user.Id);
 
-                if (model.Rating>user.TopRateReview) 
+                if (model.Rating>user.TopRateReview)
                 {
                     existingTopReview.ReviewId = model.Id;
                     existingTopReview.RestaurantId = restaurant.Id;
@@ -223,14 +223,14 @@ namespace FoodiFavs.Controllers
             user.UnReadNotiNum++;
             _db.Notifications.Add(notification);
             await _db.SaveChangesAsync();
- 
+
             var allRatings = await _db.Reviews
              .Where(r => r.RestaurantId == obj.RestaurantId)
              .Select(r => r.Rating)
              .ToListAsync();
 
             restaurant.Rating = Math.Floor(allRatings.Average() * 10) / 10;
-            
+
             await _db.SaveChangesAsync();
 
             //Find all the Users whose following the blogger 
@@ -244,7 +244,7 @@ namespace FoodiFavs.Controllers
             {
                 var notificationReview = new Notification
                 {
-                    UserId = follower.Id, 
+                    UserId = follower.Id,
                     Message = $"your favorite blogger {user.UserName} , has written a new review for {restaurant.Name}!",
                     CreatedAt = DateTime.Now,
                     IsRead = false,
@@ -268,7 +268,7 @@ namespace FoodiFavs.Controllers
         //[Authorize(Roles ="Admin")]
         public IActionResult DeleteReview(int Id)
         {
-           
+
             if (Id==0)
             {
                 return BadRequest();
@@ -280,16 +280,16 @@ namespace FoodiFavs.Controllers
             }
 
             var userId = Review.UserId;
-            var user=_db.Users.FirstOrDefault(u => u.Id==userId);
+            var user = _db.Users.FirstOrDefault(u => u.Id==userId);
             var TopRate = _db.TopReviewForUsers.FirstOrDefault(u => u.UserId==userId);
             var points = _db.Points.FirstOrDefault(p => p.UserId==userId);
             var restaurants = _db.Restaurants.FirstOrDefault(r => r.Id==Review.RestaurantId);
             var notifications = _db.Notifications.Where(n => n.ReviewId == Review.Id).ToList();
-            var order=_db.Orders.FirstOrDefault(o => o.ReviewId==Review.Id);
+            var order = _db.Orders.FirstOrDefault(o => o.ReviewId==Review.Id);
             var likes = _db.Likes.Where(l => l.ReviewId == Review.Id).ToList();
 
 
-            if (order!=null) 
+            if (order!=null)
             {
                 _db.Orders.Remove(order);
             }
@@ -299,23 +299,23 @@ namespace FoodiFavs.Controllers
             }
             if (notifications.Any())
             {
-                _db.Notifications.RemoveRange(notifications); 
+                _db.Notifications.RemoveRange(notifications);
             }
 
             _db.Reviews.Remove(Review);
-  
+
             _db.SaveChanges();
 
-            if (restaurants!=null) 
+            if (restaurants!=null)
             {
                 restaurants.ReviewCount--;
             }
-            if (points!=null) 
+            if (points!=null)
             {
                 points.PointsForEachRestaurant-=5;
                 points.AllPoints-=5;
             }
-           
+
             user.TotalLikes-=Review.Likes;
             user.TotalPoints-=5;
             Review.UserNav.ReviewCount--;
@@ -355,13 +355,13 @@ namespace FoodiFavs.Controllers
                 return NotFound();
             }
 
-           Review.Comment = obj.Comment;
+            Review.Comment = obj.Comment;
 
             _db.SaveChanges();
             return NoContent();
         }
         [HttpPost("LikeReview")]
-        public IActionResult LikeReview (int ReviewId)
+        public IActionResult LikeReview(int ReviewId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
@@ -369,15 +369,15 @@ namespace FoodiFavs.Controllers
                 return Unauthorized(); // Return 401 if user is not logged in
             }
             var user = _db.Users.FirstOrDefault(u => u.UserName == userId);
-         
+
             var Review = _db.Reviews.FirstOrDefault(r => r.Id == ReviewId);
-            if (Review == null) 
+            if (Review == null)
             {
                 return BadRequest("No Review with this Id");
             }
             var existingLike = _db.Likes.FirstOrDefault((l => l.ReviewId == ReviewId && l.UserId==user.Id));
             var reviewer = _db.Users.FirstOrDefault(u => u.Id == Review.UserId);
-            if (reviewer == null) 
+            if (reviewer == null)
             {
                 return BadRequest("Sign Up First");
             }
@@ -398,7 +398,7 @@ namespace FoodiFavs.Controllers
                 }
 
                 _db.Likes.Add(Like);
-                if (Review.UserId != user.Id) 
+                if (Review.UserId != user.Id)
                 {
                     var notification = new Notification
                     {
@@ -409,7 +409,7 @@ namespace FoodiFavs.Controllers
                         ReviewId=ReviewId,
                         NotificationType="Like",
                         RestaurantId=Review.RestaurantId
-                        
+
                     };
                     user.UnReadNotiNum++;
                     _db.Notifications.Add(notification);
@@ -450,20 +450,7 @@ namespace FoodiFavs.Controllers
 
             if (review.Comment != null)
             {
-
                 review.IsReported = true;
-
-                // notify the admin for reported review
-                var notification = new Notification
-                {
-                    UserId = "1",
-                    Message = $"Review by {review.UserId} has been reported for offensive content.",
-                    CreatedAt = DateTime.Now,
-                    IsRead = false,
-                    ReviewId=review.Id,
-                    NotificationType="Report"
-                };
-                _db.Notifications.Add(notification);
             }
             else
             {
@@ -491,9 +478,9 @@ namespace FoodiFavs.Controllers
                 return NotFound("No reviews found for the given restaurant.");
             }
 
-            
+
             var sortedReviews = reviews
-                .OrderByDescending(r => r.Likes) 
+                .OrderByDescending(r => r.Likes)
                 .Select(r => new
                 {
                     r.Id,
@@ -501,15 +488,31 @@ namespace FoodiFavs.Controllers
                     r.Rating,
                     r.UserId,
                     r.RestaurantId,
-                    r.Likes,  
+                    r.Likes,
                     r.CreatedAt
                 })
                 .ToList();
 
             return Ok(sortedReviews);
         }
-
-
+        [HttpGet("review-count")]
+        public ActionResult<int> GetReviewesNumber()
+        {
+            var reviewNumber = _db.Reviews.Select(r => r.Id).Count();
+            return reviewNumber;
+        }
+        [HttpGet("All-Reported-Review")]
+        public async Task<IActionResult> ReportedReview() 
+        {
+            var ReportedReview = _db.Reviews.Where(r => r.IsReported==true).ToList();
+            
+            if (ReportedReview==null) 
+            {
+                return BadRequest("No Reported reviews");
+            }
+            return Ok(ReportedReview);
+        
+        }
 
     }
 }
