@@ -153,7 +153,7 @@ namespace FoodiFavs.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [HttpDelete("DeleteRestaurant-ById ")]
+        [HttpDelete("DeleteRestaurant-ById")]
         //[Authorize(Roles ="Admin")]
         public IActionResult DeleteRestaurant(int Id)
         {
@@ -397,7 +397,6 @@ namespace FoodiFavs.Controllers
                 }
                 else
                 {
-
                     restaurant.AdditionalRestaurantImages = restaurant.AdditionalRestaurantImages ?? new List<string>();
                     restaurant.AdditionalRestaurantImages.Add(relativePath);
                 }

@@ -264,7 +264,7 @@ namespace FoodiFavs.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [HttpDelete("DeleteReview-ById ")]
+        [HttpDelete("DeleteReview-ById")]
         //[Authorize(Roles ="Admin")]
         public IActionResult DeleteReview(int Id)
         {
@@ -502,17 +502,43 @@ namespace FoodiFavs.Controllers
             return reviewNumber;
         }
         [HttpGet("All-Reported-Review")]
-        public async Task<IActionResult> ReportedReview() 
+        public async Task<IActionResult> ReportedReview()
         {
-            var ReportedReview = _db.Reviews.Where(r => r.IsReported==true).ToList();
-            
-            if (ReportedReview==null) 
+            var reportedReviews = _db.Reviews
+                .Where(r => r.IsReported == true)
+                .Select(r => new
+                {
+                    ReviewId = r.Id,
+                    ReviewContent = r.Comment,
+                    ReviewRate=r.Rating,
+                    ReviewLikes=r.Likes,
+                    ReviewDate=r.CreatedAt,
+                    Reviewer = new
+                    {
+                        UserId = r.UserNav.Id,
+                        UserName = r.UserNav.UserName,
+                        UserEmail = r.UserNav.ImgUrl
+                    },
+                    Restaurant = new
+                    {
+                        RestaurantId = r.RestaurantId,
+                        RestaurantNav = r.RestaurantNav.Name
+                    }
+                    
+                })
+                .ToList();
+
+            if (!reportedReviews.Any())
             {
-                return BadRequest("No Reported reviews");
+                return BadRequest("No reported reviews.");
             }
-            return Ok(ReportedReview);
-        
+
+            return Ok(new
+            {
+                ReportedReviews = reportedReviews
+            });
         }
+
 
     }
 }
