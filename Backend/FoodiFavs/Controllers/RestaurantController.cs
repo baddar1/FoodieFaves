@@ -356,56 +356,69 @@ namespace FoodiFavs.Controllers
                 return BadRequest("No file uploaded.");
             }
 
-            //Check if the restaurant exists
             var restaurant = await _db.Restaurants.FindAsync(restaurantId);
             if (restaurant == null)
             {
                 return NotFound("Restaurant not found.");
             }
 
-            //unique file name 
             var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
 
-            //Define the folder name
+            // Define the folder name
             var restaurantFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "RestaurantImgs", $"Restaurant_{restaurantId}");
 
-            //Check if the directory exists if not create it
+            // Check if the directory exists; if not, create it
             if (!Directory.Exists(restaurantFolder))
             {
                 Directory.CreateDirectory(restaurantFolder);
             }
 
-            //save the image
+            // Save the new image
             var filePath = Path.Combine(restaurantFolder, fileName);
 
-            //Save the image to folder
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
             }
+
             var relativePath = $"/RestaurantImgs/Restaurant_{restaurantId}/{fileName}";
-            if (string.IsNullOrEmpty(restaurant.ImgUrl))
+
+            // Update restaurant images
+            restaurant.AdditionalRestaurantImages = restaurant.AdditionalRestaurantImages ?? new List<string>();
+
+            if (restaurant.AdditionalRestaurantImages.Count > 0)
             {
-                restaurant.ImgUrl = relativePath; // Add this as the main image if it's the first one
+                
+                var oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", restaurant.AdditionalRestaurantImages[0].TrimStart('/'));
+                if (System.IO.File.Exists(oldImagePath))
+                {
+                    System.IO.File.Delete(oldImagePath);
+                }
+
+                
+                for (int i = restaurant.AdditionalRestaurantImages.Count - 1; i >= 0; i--)
+                {
+                    if (i == 0)
+                    {
+                        restaurant.AdditionalRestaurantImages[i] = relativePath;
+                    }
+                    else
+                    {
+                        restaurant.AdditionalRestaurantImages[i] = restaurant.AdditionalRestaurantImages[i - 1];
+                    }
+                }
             }
             else
             {
-                if (string.IsNullOrEmpty(restaurant.LogoImg))
-                {
-                    restaurant.LogoImg = relativePath;
-
-                }
-                else
-                {
-                    restaurant.AdditionalRestaurantImages = restaurant.AdditionalRestaurantImages ?? new List<string>();
-                    restaurant.AdditionalRestaurantImages.Add(relativePath);
-                }
+                // If no images exist, just add the new image
+                restaurant.AdditionalRestaurantImages.Add(relativePath);
             }
 
             await _db.SaveChangesAsync();
 
             return Ok(new { ImageUrl = relativePath });
         }
+
         [HttpGet("restaurant-count")]
         public async Task<ActionResult<int>> GetReviewesNumber()
         {
