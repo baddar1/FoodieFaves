@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using FF.Models.Dto.RestaurantDto;
 
 namespace FoodiFavs.Controllers
 {
@@ -178,30 +179,47 @@ namespace FoodiFavs.Controllers
             return Ok(activeVouchers);
         }
         [HttpGet("Get-ResturantsAndPoints")]
-        public IActionResult ResturantsAndPoints()
+        public IActionResult RestaurantsAndPoints()
         {
             var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userName == null)
             {
                 return Unauthorized(); // User is not logged in
             }
+
             var user = _db.Users.FirstOrDefault(u => u.UserName == userName);
-
-            var ResturantsPoints = _db.Points.FirstOrDefault(p => p.UserId==user.Id);
-
-            if (ResturantsPoints == null)
+            if (user == null)
             {
-                return BadRequest("Try to review restaurants first");
-
+                return BadRequest("User not found.");
             }
+
+            // Fetch all points with associated restaurants for the user
+            var restaurantsPoints = _db.Points
+                .Include(p => p.Restaurant)
+                .Where(p => p.UserId == user.Id)
+                .Select(p => new RestaurantPointsDto
+                {
+                    RestaurantName = p.Restaurant.Name,
+                    RestaurantId=p.RestaurantId,
+                    Points = p.PointsForEachRestaurant
+                })
+                .ToList();
+
+            if (!restaurantsPoints.Any())
+            {
+                return BadRequest("Try to review restaurants first.");
+            }
+
             return Ok(new
             {
-                ResturantsPoints.Restaurant.Name,
-                ResturantsPoints.PointsForEachRestaurant,
+
+                Restaurants = restaurantsPoints
 
             });
-
         }
+
+
+
 
 
 
