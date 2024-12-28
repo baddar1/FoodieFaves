@@ -212,7 +212,9 @@ namespace FoodiFavs.Controllers
 
             return Ok(new
             {
+
                 Restaurants = restaurantsPoints
+
             });
         }
 
