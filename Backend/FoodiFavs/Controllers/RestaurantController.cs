@@ -7,6 +7,9 @@ using FF.Models.Dto.RestaurantDto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.InteropServices;
+using System.IO;
+using System.Net.Http;
+
 namespace FoodiFavs.Controllers
 {
     [Route("api/[controller]")]
@@ -16,11 +19,13 @@ namespace FoodiFavs.Controllers
         private readonly ApplicationDbContext _db;
         private readonly ILogger<RestaurantController> _logger;
         private readonly IUnitOfWork _unitOfWork;
-        public RestaurantController(ILogger<RestaurantController> logger,ApplicationDbContext db,IUnitOfWork unitOfWork)
+        private readonly HttpClient _httpClient;
+        public RestaurantController(ILogger<RestaurantController> logger,ApplicationDbContext db,IUnitOfWork unitOfWork, HttpClient httpClient)
         {
             _logger = logger;
             _db = db;
-            _unitOfWork = unitOfWork;   
+            _unitOfWork = unitOfWork;  
+            _httpClient = httpClient;
         }
         [HttpGet("Get-All-Restaurants")] //End point
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -155,22 +160,93 @@ namespace FoodiFavs.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpDelete("DeleteRestaurant-ById")]
         //[Authorize(Roles ="Admin")]
-        public IActionResult DeleteRestaurant(int Id)
+        public async Task<IActionResult> DeleteRestaurant(int restaurantId)
         {
+            // Find the restaurant by its ID
+            var restaurant = await _db.Restaurants
+                                       .Include(r => r.ReviweNav)
+                                       .Include(r => r.TopReviews)
+                                       .Include(r => r.FavoriteRestaurants)
+                                       .Include(r => r.UserRestaurantPoints)
+                                       .Include(r => r.Orders)
+                                       .FirstOrDefaultAsync(r => r.Id == restaurantId);
 
-            if (Id==0)
+            if (restaurant == null)
             {
-                return BadRequest();
+                return NotFound("Restaurant not found.");
             }
-            var Restaurant = _db.Restaurants.FirstOrDefault(u => u.Id==Id);
-            if (Restaurant == null)
+
+            // Delete images associated with the restaurant
+            if (!string.IsNullOrEmpty(restaurant.ImgUrl))
             {
-                return NotFound();
+                DeleteImageFile(restaurant.ImgUrl);
             }
-            _db.Restaurants.Remove(Restaurant);
-            _db.SaveChanges();
-            return NoContent();
+
+            if (!string.IsNullOrEmpty(restaurant.LogoImg))
+            {
+                DeleteImageFile(restaurant.LogoImg);
+            }
+
+            if (restaurant.AdditionalRestaurantImages != null)
+            {
+                foreach (var imageUrl in restaurant.AdditionalRestaurantImages)
+                {
+                    DeleteImageFile(imageUrl);
+                }
+            }
+
+            // Call the DeleteReview API for each review associated with the restaurant
+            if (restaurant.ReviweNav != null)
+            {
+                foreach (var review in restaurant.ReviweNav)
+                {
+                    // Make the API call to delete the review
+                    var deleteReviewUrl = $"https://localhost:7063/api/Review/DeleteReview-ById/{review.Id}";
+
+                    // Make the API call to delete the review
+                    var response = await _httpClient.DeleteAsync(deleteReviewUrl);
+                    var m = response.Content;
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        // Handle the error appropriately if needed
+                        return StatusCode((int)response.StatusCode, "Failed to delete review.");
+                    }
+                }
+            }
+
+            // Remove top reviews related to this restaurant
+            if (restaurant.TopReviews != null)
+            {
+                _db.TopReviewForUsers.RemoveRange(restaurant.TopReviews);
+            }
+
+            // Remove users' favorite entries for this restaurant
+            if (restaurant.FavoriteRestaurants != null)
+            {
+                _db.FavoriteRestaurants.RemoveRange(restaurant.FavoriteRestaurants);
+            }
+
+            // Remove user points related to this restaurant
+            if (restaurant.UserRestaurantPoints != null)
+            {
+                _db.Points.RemoveRange(restaurant.UserRestaurantPoints);
+            }
+
+            // Remove any orders related to this restaurant
+            if (restaurant.Orders != null)
+            {
+                _db.Orders.RemoveRange(restaurant.Orders);
+            }
+
+            // Remove the restaurant itself
+            _db.Restaurants.Remove(restaurant);
+
+            // Save all changes
+            await _db.SaveChangesAsync();
+
+            return NoContent(); // Return a success response
         }
+
 
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -348,65 +424,157 @@ namespace FoodiFavs.Controllers
 
             return Ok(sortedRestaurant);
         }
-        [HttpPost("upload-Restaurant-images")]
-        public async Task<IActionResult> UploadRestaurantImage(int restaurantId, IFormFile file)
+        [HttpPost("AddLogo")]
+        public async Task<IActionResult> AddLogo(int restaurantId, IFormFile file)
         {
             if (file == null || file.Length == 0)
-            {
                 return BadRequest("No file uploaded.");
-            }
 
-            //Check if the restaurant exists
             var restaurant = await _db.Restaurants.FindAsync(restaurantId);
             if (restaurant == null)
-            {
                 return NotFound("Restaurant not found.");
-            }
 
-            //unique file name 
+           
+            var relativePath = await SaveImage(restaurantId, file);
+
+            
+            restaurant.LogoImg = relativePath;
+
+            await _db.SaveChangesAsync();
+            return Ok(new { LogoUrl = relativePath });
+        }
+        [HttpDelete("DeleteLogo")]
+        public async Task<IActionResult> DeleteLogo(int restaurantId)
+        {
+            var restaurant = await _db.Restaurants.FindAsync(restaurantId);
+            if (restaurant == null)
+                return NotFound("Restaurant not found.");
+
+            if (string.IsNullOrEmpty(restaurant.LogoImg))
+                return BadRequest("No logo image to delete.");
+
+         
+            DeleteImageFile(restaurant.LogoImg);
+            restaurant.LogoImg = null;
+
+            await _db.SaveChangesAsync();
+            return Ok("Logo deleted successfully.");
+        }   
+        [HttpPost("AddProfileImage")]
+        public async Task<IActionResult> AddProfileImage(int restaurantId, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded.");
+
+            var restaurant = await _db.Restaurants.FindAsync(restaurantId);
+            if (restaurant == null)
+                return NotFound("Restaurant not found.");
+
+            
+            var relativePath = await SaveImage(restaurantId, file);
+
+        
+            restaurant.ImgUrl = relativePath;
+
+            await _db.SaveChangesAsync();
+            return Ok(new { ProfileImageUrl = relativePath });
+        }       
+        [HttpDelete("DeleteProfileImage")]
+        public async Task<IActionResult> DeleteProfileImage(int restaurantId)
+        {
+            var restaurant = await _db.Restaurants.FindAsync(restaurantId);
+            if (restaurant == null)
+                return NotFound("Restaurant not found.");
+
+            if (string.IsNullOrEmpty(restaurant.ImgUrl))
+                return BadRequest("No profile image to delete.");
+
+         
+            DeleteImageFile(restaurant.ImgUrl);
+            restaurant.ImgUrl = null;
+
+            await _db.SaveChangesAsync();
+            return Ok("Profile image deleted successfully.");
+        }
+
+        [HttpPost("AddAdditionalImage")]
+        public async Task<IActionResult> AddAdditionalImage(int restaurantId, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded.");
+
+            var restaurant = await _db.Restaurants.FindAsync(restaurantId);
+            if (restaurant == null)
+                return NotFound("Restaurant not found.");
+
+            restaurant.AdditionalRestaurantImages ??= new List<string>();
+
+            if (restaurant.AdditionalRestaurantImages.Count >= 5)
+                return BadRequest("You can only have 5 additional images. Please delete an image before adding a new one.");
+
+            var relativePath = await SaveImage(restaurantId, file);
+
+            restaurant.AdditionalRestaurantImages.Add(relativePath);
+
+            await _db.SaveChangesAsync();
+            return Ok(new { AdditionalImageUrl = relativePath });
+        }
+
+        [HttpDelete("DeleteAdditionalImage")]
+        public async Task<IActionResult> DeleteAdditionalImageByIndex(int restaurantId, int index)
+        {
+            var restaurant = await _db.Restaurants.FindAsync(restaurantId);
+            if (restaurant == null)
+                return NotFound("Restaurant not found.");
+
+            if (restaurant.AdditionalRestaurantImages == null || restaurant.AdditionalRestaurantImages.Count == 0)
+                return BadRequest("No additional images found.");
+
+            if (index < 0 || index >= restaurant.AdditionalRestaurantImages.Count)
+                return BadRequest($"Invalid index. Provide an index between 0 and {restaurant.AdditionalRestaurantImages.Count - 1}.");
+
+            var imageUrl = restaurant.AdditionalRestaurantImages[index];
+
+            restaurant.AdditionalRestaurantImages.RemoveAt(index);
+
+            DeleteImageFile(imageUrl);
+
+            await _db.SaveChangesAsync();
+            return Ok($"Image at index {index} deleted successfully.");
+        }
+
+        private async Task<string> SaveImage(int restaurantId, IFormFile file)
+        {
             var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-
-            //Define the folder name
             var restaurantFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "RestaurantImgs", $"Restaurant_{restaurantId}");
 
-            //Check if the directory exists if not create it
             if (!Directory.Exists(restaurantFolder))
-            {
                 Directory.CreateDirectory(restaurantFolder);
-            }
 
-            //save the image
             var filePath = Path.Combine(restaurantFolder, fileName);
 
-            //Save the image to folder
             using (var stream = new FileStream(filePath, FileMode.Create))
-            {
                 await file.CopyToAsync(stream);
-            }
-            var relativePath = $"/RestaurantImgs/Restaurant_{restaurantId}/{fileName}";
-            if (string.IsNullOrEmpty(restaurant.ImgUrl))
+
+            return $"/RestaurantImgs/Restaurant_{restaurantId}/{fileName}";
+        }
+        private void DeleteImageFile(string relativePath)
+        {
+            if (string.IsNullOrEmpty(relativePath))
+                throw new ArgumentException("File path is invalid.", nameof(relativePath));
+                   
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", relativePath.TrimStart('/'));
+
+            if (System.IO.File.Exists(filePath))
             {
-                restaurant.ImgUrl = relativePath; // Add this as the main image if it's the first one
+                System.IO.File.Delete(filePath);
+                Console.WriteLine($"File deleted: {filePath}");
             }
             else
             {
-                if (string.IsNullOrEmpty(restaurant.LogoImg))
-                {
-                    restaurant.LogoImg = relativePath;
-
-                }
-                else
-                {
-                    restaurant.AdditionalRestaurantImages = restaurant.AdditionalRestaurantImages ?? new List<string>();
-                    restaurant.AdditionalRestaurantImages.Add(relativePath);
-                }
+                Console.WriteLine($"File not found: {filePath}");
             }
-
-            await _db.SaveChangesAsync();
-
-            return Ok(new { ImageUrl = relativePath });
         }
-
         [HttpGet("restaurant-count")]
         public async Task<ActionResult<int>> GetReviewesNumber()
         {

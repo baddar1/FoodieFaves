@@ -12,7 +12,8 @@ namespace FF.Models.Dto.UserDto
         public string UserName { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
-        public ICollection<PointsDto>? UserPoints { get; set; }
+        public int? UnReadNotiNum { get; set; } = 0;
+        public int? UserPoints { get; set; }
 
     }
 }

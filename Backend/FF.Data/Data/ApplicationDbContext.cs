@@ -30,6 +30,12 @@ namespace FF.Data.Access.Data
         {
             base.OnModelCreating(builder);
 
+            builder.Entity<Review>()
+            .HasOne(r => r.RestaurantNav)  // Assuming the Review entity has a Restaurant property
+            .WithMany()  // Assuming no navigation property on the Restaurant entity
+            .HasForeignKey(r => r.RestaurantId)  // Assuming the foreign key is named RestaurantId
+            .OnDelete(DeleteBehavior.Cascade);
+
             builder.Entity<Order>()
                .HasOne(o => o.ReviewNav)
                .WithOne(r => r.OrderNav)
@@ -40,7 +46,7 @@ namespace FF.Data.Access.Data
                    .HasMany(r => r.ReviweNav)
                    .WithOne(r => r.RestaurantNav)
                    .HasForeignKey(r => r.RestaurantId)
-                   .OnDelete(DeleteBehavior.NoAction);
+                   .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Like>()
                 .HasOne(l => l.Review)
@@ -79,7 +85,31 @@ namespace FF.Data.Access.Data
                 .WithMany(r => r.TopReviews)
                 .HasForeignKey(tr => tr.RestaurantId)
                 .OnDelete(DeleteBehavior.NoAction);
+            //restaurant entity
+            builder.Entity<Review>()
+               .HasOne(r => r.RestaurantNav)
+               .WithMany(r => r.ReviweNav)
+               .OnDelete(DeleteBehavior.Cascade);
 
+            builder.Entity<FavoriteRestaurants>()
+                .HasOne(fr => fr.Restaurant)
+                .WithMany(r => r.FavoriteRestaurants)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<Order>()
+                .HasOne(o => o.Restaurant)
+                .WithMany(r => r.Orders)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<Points>()
+                .HasOne(p => p.Restaurant)
+                .WithMany(r => r.UserRestaurantPoints)
+                .OnDelete(DeleteBehavior.NoAction);
+            builder.Entity<Notification>()
+                .HasOne(n => n.ReviewNav)
+                .WithMany(r => r.NotificationNav)
+                .HasForeignKey(n => n.ReviewId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             builder.Entity<Restaurant>().HasData(
                 new Restaurant

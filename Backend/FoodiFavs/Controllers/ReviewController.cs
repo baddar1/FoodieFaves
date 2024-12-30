@@ -260,11 +260,10 @@ namespace FoodiFavs.Controllers
             await _db.SaveChangesAsync();
             return Ok();
         }
-
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [HttpDelete("DeleteReview-ById")]
+        [HttpDelete("DeleteReview-ById/{Id}")]
         //[Authorize(Roles ="Admin")]
         public IActionResult DeleteReview(int Id)
         {
@@ -301,10 +300,14 @@ namespace FoodiFavs.Controllers
             {
                 _db.Notifications.RemoveRange(notifications);
             }
-
+            var topReview = _db.TopReviewForUsers.FirstOrDefault(tr => tr.ReviewId == Id);
+            if (topReview != null)
+            {
+                _db.TopReviewForUsers.Remove(topReview);
+            }
             _db.Reviews.Remove(Review);
 
-            _db.SaveChanges();
+          
 
             if (restaurants!=null)
             {
@@ -339,7 +342,6 @@ namespace FoodiFavs.Controllers
             _db.SaveChanges();
             return NoContent();
         }
-
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
