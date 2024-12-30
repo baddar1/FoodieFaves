@@ -18,13 +18,17 @@ using FF.Data.Helper;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddControllers();
+// Add HttpClient to the DI container
+builder.Services.AddHttpClient();
+
 // Add services to the container.
 builder.Services.Configure<IdentityOptions>(options =>
 {
     options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultEmailProvider; // Ensure this is set
     options.User.RequireUniqueEmail = true; // Optional, based on your requirements
 });
-builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Logging.ClearProviders();

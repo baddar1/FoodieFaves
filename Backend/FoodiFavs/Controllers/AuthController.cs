@@ -166,19 +166,21 @@ namespace FoodiFavs.Controllers
             Console.WriteLine($"User ID from claims: {userId}");
 
             var user = await _userManager.FindByNameAsync(userId);
-
+            
             if (user == null)
             {
                 return NotFound("User not found.");
             }
             //Adding Points to each restaurant
-            
+            var user1=_db.Users.FirstOrDefault(u => u.UserName == userId);
             var userInfo = new UserInfoDto
             {
                 UserName = user.UserName,
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
-               
+                UnReadNotiNum=user1.UnReadNotiNum,
+                UserPoints=user1.TotalPoints,
+
             };
 
             return Ok(userInfo);

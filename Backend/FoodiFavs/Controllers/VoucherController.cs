@@ -47,7 +47,7 @@ namespace FoodiFavs.Controllers
 
             var formattedCode = $"{guid.Substring(0, 4)}-{guid.Substring(4, 4)}-{guid.Substring(8, 4)}";
             Vouchers SetVoucher;
-            if (points == 50)
+            if (points == 50 && user.TotalPoints>=points)
             {
                 if (RestaurantPoints.PointsForEachRestaurant<points)
                 {
@@ -64,7 +64,7 @@ namespace FoodiFavs.Controllers
                 };
                 
             }
-            else if (points == 100)
+            else if (points == 100 && user.TotalPoints>=points)
             {
                 if (RestaurantPoints.PointsForEachRestaurant<points)
                 {
@@ -80,7 +80,7 @@ namespace FoodiFavs.Controllers
                     voucherCode = formattedCode
                 };
             }
-            else if (points == 200)
+            else if (points == 200 && user.TotalPoints >= points)
             {
                 if (RestaurantPoints.PointsForEachRestaurant<points)
                 {
