@@ -207,16 +207,17 @@ namespace FoodiFavs.Controllers
                 //To find top review for each user
                 var existingTopReview = _db.TopReviewForUsers.FirstOrDefault(tr => tr.UserId == user.Id);
 
-                if (model.Rating>user.TopRateReview)
-                {
-                    existingTopReview.ReviewId = model.Id;
-                    existingTopReview.RestaurantId = restaurant.Id;
-                    existingTopReview.TopRate = model.Rating;
+                if (existingTopReview!=null)
+                    if (model.Rating>user.TopRateReview)
+                    {
+                        existingTopReview.ReviewId = model.Id;
+                        existingTopReview.RestaurantId = restaurant.Id;
+                        existingTopReview.TopRate = model.Rating;
 
-                    user.TopRateReview = model.Rating;
-                    await _db.SaveChangesAsync();
+                        user.TopRateReview = model.Rating;
+                        await _db.SaveChangesAsync();
 
-                }
+                    }
             }
             userRestaurantPoints.AllPoints=user.TotalPoints;
             user.UnReadNotiNum = user.UnReadNotiNum ?? 0;
