@@ -210,9 +210,9 @@ namespace FoodiFavs.Controllers
 
             // Send email with the callback URL
             await _emailSender.SendEmailAsync(model.Email, "Reset Password",
-                $"Reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
+                $"Reset your password by this code: {encodedToken}");
 
-            return Ok("Password reset link has been sent to your email.");
+            return Ok("Password reset code has been sent to your email.");
         }
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto model)
