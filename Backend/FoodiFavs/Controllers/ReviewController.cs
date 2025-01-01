@@ -280,7 +280,6 @@ namespace FoodiFavs.Controllers
 
             var userId = Review.UserId;
             var user = _db.Users.FirstOrDefault(u => u.Id==userId);
-            var TopRate = _db.TopReviewForUsers.FirstOrDefault(u => u.UserId==userId);
             var points = _db.Points.FirstOrDefault(p => p.UserId==userId);
             var restaurants = _db.Restaurants.FirstOrDefault(r => r.Id==Review.RestaurantId);
             var notifications = _db.Notifications.Where(n => n.ReviewId == Review.Id).ToList();
@@ -349,6 +348,7 @@ namespace FoodiFavs.Controllers
 
             Review.UserNav.ReviewCount--;
 
+            var TopRate = _db.TopReviewForUsers.FirstOrDefault(u => u.UserId==userId);
 
             if (TopRate != null)
             {
