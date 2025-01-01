@@ -253,7 +253,25 @@ namespace FoodiFavs.Controllers
 
             return Ok(new { message = "Logged out successfully." });
         }
-        
+        [HttpPost("Add-Admin")]
+        [Authorize]
+        public async Task<IActionResult> AddAdminAsync()
+        {
+            var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userName == null)
+            {
+                return Unauthorized(); // Return 401 if user is not logged in
+            }
+            var user = await _userManager.FindByNameAsync(userName);
+            var result = await _authService.AddAdmin(user);
+
+            if (!String.IsNullOrEmpty(result))
+            {
+                return BadRequest(result);
+            }
+            return Ok($"User {user.UserName} has been added to the Admin role successfully.");
+
+        }
 
     }
 }

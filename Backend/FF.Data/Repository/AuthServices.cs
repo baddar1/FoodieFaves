@@ -323,5 +323,25 @@ namespace FF.Data.Repository
 
             return await UserManager.ResetPasswordAsync(user,model.Token , model.NewPassword);
         }
+        public async Task<string> AddAdmin(ApplicationUser user)
+        {
+
+            if (user == null)
+            {
+                return ("Invalid user ID"); ; // Return 401 if user is not logged in
+            }
+
+            if (await UserManager.IsInRoleAsync(user, "Admin"))
+            {
+                return ("User already assigned to this role");
+            }
+            var result = await UserManager.AddToRoleAsync(user, "Admin");
+            if (result.Succeeded)
+            {
+                return string.Empty;
+            }
+            return "Somehhing went wrong";
+
+        }
     }
 }

@@ -183,16 +183,10 @@ namespace FoodiFavs.Controllers
                     PointsForEachRestaurant = 5,
                 };
 
-                TopReview.UserId=user.Id;
-                TopReview.ReviewId=model.Id;
-                user.TopRateReview=model.Rating;
-                TopReview.TopRate=model.Rating;
-                TopReview.RestaurantId=restaurant.Id;
 
                 notification.Message = $"{user.UserName} Congratulations on posting your first review on {restaurant.Name} You've earned 5 points for your contribution!";
                 notification.ReviewId=model.Id;
                 notification.RestaurantId=model.RestaurantId;
-                _db.TopReviewForUsers.Add(TopReview);
                 _db.Points.Add(userRestaurantPoints);
                 await _db.SaveChangesAsync();
             }
@@ -218,6 +212,18 @@ namespace FoodiFavs.Controllers
                         await _db.SaveChangesAsync();
 
                     }
+
+                    else 
+                    {
+                        TopReview.UserId=user.Id;
+                        TopReview.ReviewId=model.Id;
+                        user.TopRateReview=model.Rating;
+                        TopReview.TopRate=model.Rating;
+                        TopReview.RestaurantId=restaurant.Id;
+                        _db.TopReviewForUsers.Add(TopReview);
+
+                    }
+
             }
             userRestaurantPoints.AllPoints=user.TotalPoints;
             user.UnReadNotiNum = user.UnReadNotiNum ?? 0;
@@ -266,7 +272,7 @@ namespace FoodiFavs.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpDelete("DeleteReview-ById/{Id}")]
         //[Authorize(Roles ="Admin")]
-        public IActionResult DeleteReview(int Id)
+        public async Task<IActionResult> DeleteReview(int Id)
         {
 
             if (Id==0)
@@ -331,6 +337,7 @@ namespace FoodiFavs.Controllers
 
             }
 
+
 if (user.TotalLikes>0)
 {
     user.TotalLikes-=Review.Likes;
@@ -347,7 +354,23 @@ if (user.TotalPoints > 0)
 else
     user.TotalPoints=0;
 
+
+            if (user.TotalPoints > 0)
+            {
+                user.TotalPoints-=5;
+            }
+            else
+                user.TotalPoints=0;
+            
+
             Review.UserNav.ReviewCount--;
+            var allRatings =  await _db.Reviews
+             .Where(r => r.RestaurantId == restaurants.Id)
+             .Select(r => r.Rating)
+             .ToListAsync();
+
+
+            restaurants.Rating = Math.Floor(allRatings.Average() * 10) / 10;
 
             var TopRate = _db.TopReviewForUsers.FirstOrDefault(u => u.UserId==userId);
 
@@ -364,6 +387,18 @@ else
                     TopRate.TopRate=topRatedReview.Rating;
                     TopRate.RestaurantId=topRatedReview.RestaurantId;
                 }
+            }
+            else 
+            {
+                var TopReview = new TopReviewForUser
+                {
+                    UserId=user.Id,
+                    ReviewId=Review.Id,
+                    TopRate=Review.Rating,
+                    RestaurantId=Review.Id,
+                };
+                user.TopRateReview=Review.Rating;
+                _db.TopReviewForUsers.Add(TopReview);
             }
 
             _db.SaveChanges();

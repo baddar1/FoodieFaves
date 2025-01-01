@@ -23,6 +23,7 @@ namespace FF.Data.Repository.IRepository
         Task<AuthModel> RegisterAsync(RegisterModel1 model);
         Task<AuthModel> GetTokenAsync(TokenRequestModel model);
         Task<string> AddRoleAsync(AddRoleModel model);
+        Task<string> AddAdmin(ApplicationUser user);
 
     }
 }
