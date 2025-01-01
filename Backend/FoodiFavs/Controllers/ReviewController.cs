@@ -325,7 +325,7 @@ namespace FoodiFavs.Controllers
             user.TotalLikes-=Review.Likes;
 
             if(user.TotalLikes > 0)
-            user.TotalPoints-=5;
+
 
             Review.UserNav.ReviewCount--;
 
