@@ -320,6 +320,15 @@ namespace FoodiFavs.Controllers
                     points.PointsForEachRestaurant-=5;
                     points.AllPoints-=5;
                 }
+
+                else 
+                {
+                    points.PointsForEachRestaurant=0;
+                    points.AllPoints=0;
+                }
+
+
+
             }
 
             user.TotalLikes-=Review.Likes;
