@@ -31,11 +31,14 @@ namespace FoodiFavs.Controllers
             {
                 return Unauthorized(); // Return 401 if user is not logged in
             }
+
             var user = _db.Users.FirstOrDefault(u => u.UserName == userId);
-            // Retrieve all notifications for the user
+
+            // Retrieve the top 10 most recent notifications for the user
             var notifications = await _db.Notifications
                 .Where(n => n.UserId == user.Id)
-                .OrderByDescending(n => n.CreatedAt) 
+                .OrderByDescending(n => n.CreatedAt)
+                .Take(10) // Limit to the top 10
                 .Select(n => new
                 {
                     n.Message,
@@ -47,11 +50,14 @@ namespace FoodiFavs.Controllers
             {
                 return NotFound("No notifications yet.");
             }
-            user.UnReadNotiNum=0;
+
+            // Reset unread notifications count
+            user.UnReadNotiNum = 0;
             _db.SaveChanges();
 
-            return Ok(notifications); 
+            return Ok(notifications);
         }
+
 
     }
 }
