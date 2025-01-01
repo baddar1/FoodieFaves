@@ -330,14 +330,21 @@ namespace FoodiFavs.Controllers
 
             }
 
-            user.TotalLikes-=Review.Likes;
+if (user.TotalLikes>0)
+{
+    user.TotalLikes-=Review.Likes;
+}
+else
+{
+    user.TotalLikes=0;
+}
 
-            if (user.TotalPoints > 0)
-            {
-                user.TotalPoints-=5;
-            }
-            else
-                user.TotalPoints=0;
+if (user.TotalPoints > 0)
+{
+    user.TotalPoints-=5;
+}
+else
+    user.TotalPoints=0;
 
             Review.UserNav.ReviewCount--;
 

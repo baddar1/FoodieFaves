@@ -78,7 +78,7 @@ namespace FF.Data.Access.Data
                 .HasOne(tr => tr.ReviewNav)
                 .WithMany(r => r.TopReviews)
                 .HasForeignKey(tr => tr.ReviewId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
             // Relationship: Restaurant -> TopReviewForUser
             builder.Entity<TopReviewForUser>()
                 .HasOne(tr => tr.RestaurantNav)
