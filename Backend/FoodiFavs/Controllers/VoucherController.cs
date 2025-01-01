@@ -47,9 +47,9 @@ namespace FoodiFavs.Controllers
 
             var formattedCode = $"{guid.Substring(0, 4)}-{guid.Substring(4, 4)}-{guid.Substring(8, 4)}";
             Vouchers SetVoucher;
-            if (points == 50 && user.TotalPoints>=points)
+            if (points == 50)
             {
-                if (RestaurantPoints.PointsForEachRestaurant<points)
+                if (RestaurantPoints.PointsForEachRestaurant>=points)
                 {
                     return BadRequest($"Sorry {user.UserName} you can't afford this voucher");
                 }
@@ -64,9 +64,9 @@ namespace FoodiFavs.Controllers
                 };
                 
             }
-            else if (points == 100 && user.TotalPoints>=points)
+            else if (points == 100)
             {
-                if (RestaurantPoints.PointsForEachRestaurant<points)
+                if (RestaurantPoints.PointsForEachRestaurant>=points)
                 {
                     return BadRequest($"Sorry {user.UserName} you can't afford this voucher");
                 }
@@ -80,9 +80,9 @@ namespace FoodiFavs.Controllers
                     voucherCode = formattedCode
                 };
             }
-            else if (points == 200 && user.TotalPoints >= points)
+            else if (points == 200)
             {
-                if (RestaurantPoints.PointsForEachRestaurant<points)
+                if (RestaurantPoints.PointsForEachRestaurant>=points)
                 {
                     return BadRequest($"Sorry {user.UserName} you can't afford this voucher");
                 }
