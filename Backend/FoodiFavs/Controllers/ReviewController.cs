@@ -307,7 +307,8 @@ namespace FoodiFavs.Controllers
             }
             _db.Reviews.Remove(Review);
 
-          
+            _db.SaveChanges();
+
 
             if (restaurants!=null)
             {
