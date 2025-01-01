@@ -48,7 +48,6 @@ namespace FoodiFavs.Controllers
                 };
                 _db.FavoriteRestaurants.Add(Favorite);
            
-                user.UnReadNotiNum++;
                 _db.SaveChanges();
                 return Ok();
             
@@ -136,7 +135,6 @@ namespace FoodiFavs.Controllers
             blogger.UnReadNotiNum = blogger.UnReadNotiNum ?? 0;
             blogger.UnReadNotiNum++;
 
-            user.UnReadNotiNum++;
                 _db.Notifications.Add(notification);
                 _db.SaveChanges();
 
