@@ -40,26 +40,17 @@ namespace FoodiFavs.Controllers
             {
                 return BadRequest($"{restaurant.Name} is already in the favorite list");
             }
-            var notification = new Notification
-            {
-                UserId = user.Id,
-                Message ="",
-                CreatedAt = DateTime.Now,
-                IsRead = false,
-                NotificationType="Favorite Restaurant",
-                RestaurantId=restaurant.Id,
-            };
+        
                 var Favorite = new FavoriteRestaurants
                 {
                     RestaurantId = RestaurantId,
                     UserId = user.Id
                 };
                 _db.FavoriteRestaurants.Add(Favorite);
-                notification.Message=$"{restaurant.Name} is add to your favorite restaurants list";
+           
                 user.UnReadNotiNum++;
-                _db.Notifications.Add(notification);
                 _db.SaveChanges();
-                return Ok(notification.Message);
+                return Ok();
             
         }
         [HttpGet("Get-Favorite-Restaurants")]

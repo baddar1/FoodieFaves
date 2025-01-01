@@ -413,7 +413,12 @@ namespace FoodiFavs.Controllers
                         RestaurantId=Review.RestaurantId
 
                     };
-                    user.UnReadNotiNum++;
+                    var Blogger = _db.Users.FirstOrDefault(u => u.Id==Review.UserId);
+                    if (Blogger != null) 
+                    {
+                        return BadRequest("No User with this review");
+                    }
+                    Blogger.UnReadNotiNum++;
                     _db.Notifications.Add(notification);
                 }
 
