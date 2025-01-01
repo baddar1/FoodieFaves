@@ -29,6 +29,11 @@ namespace FF.Data.Access.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            builder.Entity<TopReviewForUser>()
+            .HasOne(tr => tr.ReviewNav)
+            .WithMany(r => r.TopReviews)
+            .HasForeignKey(tr => tr.ReviewId)
+            .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Review>()
             .HasOne(r => r.RestaurantNav)  // Assuming the Review entity has a Restaurant property

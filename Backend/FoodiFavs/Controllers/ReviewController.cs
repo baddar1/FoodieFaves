@@ -300,10 +300,10 @@ namespace FoodiFavs.Controllers
             {
                 _db.Notifications.RemoveRange(notifications);
             }
-            var topReview = _db.TopReviewForUsers.FirstOrDefault(tr => tr.ReviewId == Id);
-            if (topReview != null)
+            var topReviews = _db.TopReviewForUsers.Where(tr => tr.ReviewId == Id).ToList();
+            if (topReviews.Any())
             {
-                _db.TopReviewForUsers.Remove(topReview);
+                _db.TopReviewForUsers.RemoveRange(topReviews); // Remove all related records
             }
             _db.Reviews.Remove(Review);
 
