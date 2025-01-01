@@ -326,6 +326,7 @@ namespace FoodiFavs.Controllers
                     points.AllPoints=0;
                 }
 
+
             }
 
             user.TotalLikes-=Review.Likes;
