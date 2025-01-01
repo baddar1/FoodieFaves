@@ -315,12 +315,18 @@ namespace FoodiFavs.Controllers
             }
             if (points!=null)
             {
-                points.PointsForEachRestaurant-=5;
-                points.AllPoints-=5;
+                if (points.PointsForEachRestaurant>0 || points.AllPoints > 0)
+                {
+                    points.PointsForEachRestaurant-=5;
+                    points.AllPoints-=5;
+                }
             }
 
             user.TotalLikes-=Review.Likes;
+
+            if(user.TotalLikes > 0)
             user.TotalPoints-=5;
+
             Review.UserNav.ReviewCount--;
 
 
