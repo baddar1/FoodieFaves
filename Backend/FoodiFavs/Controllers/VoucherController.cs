@@ -49,7 +49,7 @@ namespace FoodiFavs.Controllers
             Vouchers SetVoucher;
             if (points == 50)
             {
-                if (RestaurantPoints.PointsForEachRestaurant>=points)
+                if (RestaurantPoints.PointsForEachRestaurant<=points)
                 {
                     return BadRequest($"Sorry {user.UserName} you can't afford this voucher");
                 }
@@ -66,7 +66,7 @@ namespace FoodiFavs.Controllers
             }
             else if (points == 100)
             {
-                if (RestaurantPoints.PointsForEachRestaurant>=points)
+                if (RestaurantPoints.PointsForEachRestaurant<=points)
                 {
                     return BadRequest($"Sorry {user.UserName} you can't afford this voucher");
                 }
@@ -82,7 +82,7 @@ namespace FoodiFavs.Controllers
             }
             else if (points == 200)
             {
-                if (RestaurantPoints.PointsForEachRestaurant>=points)
+                if (RestaurantPoints.PointsForEachRestaurant<=points)
                 {
                     return BadRequest($"Sorry {user.UserName} you can't afford this voucher");
                 }

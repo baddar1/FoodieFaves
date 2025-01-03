@@ -18,7 +18,7 @@ namespace FF.Data.Repository.IRepository
         Task<string> GeneratePasswordResetTokenAsync(string email);
         Task<AuthModel> ConfirmEmailAsync(string code);
         Task<IdentityResult> ResetPasswordAsync(ResetPasswordDto model);
-        Task<IdentityResult> UpdateUserAsync(UserUpdateDto user, ClaimsPrincipal userClaims);
+        Task<IdentityResult> UpdateUserAsync(UserUpdateDto? user, ClaimsPrincipal userClaims);
         Task<ApplicationUser> GetUserByIdAsync(string id);
         Task<AuthModel> RegisterAsync(RegisterModel1 model);
         Task<AuthModel> GetTokenAsync(TokenRequestModel model);

@@ -132,7 +132,7 @@ namespace FoodiFavs.Controllers
             // Log the userId to see if it's being retrieved correctly
             Console.WriteLine($"UserId from claims: {userId}");
             User dbUser = await _db.Users.FirstOrDefaultAsync(u => u.UserName == userId);
-
+            var ApplicationUser = await _userManager.FindByNameAsync(userId);
             var result = await _authService.UpdateUserAsync(model, User);
             if (result.Succeeded)
             {
