@@ -201,7 +201,7 @@ namespace FoodiFavs.Controllers
             // Fetch top 10 
             var topReviewers = await _db.Users
                 .OrderByDescending(u => u.ReviewCount) 
-                .Where(u=>u.ReviewCount>10)
+                .Where(u=>u.ReviewCount>1)
                 .Take(10) // Get top 10 users
                 // Select the User info
                 .Select(u => new
