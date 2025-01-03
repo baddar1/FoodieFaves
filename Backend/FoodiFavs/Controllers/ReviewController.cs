@@ -180,7 +180,7 @@ namespace FoodiFavs.Controllers
                 {
                     UserId = user.Id,
                     RestaurantId = obj.RestaurantId,
-                    PointsForEachRestaurant = 5,
+                    PointsForEachRestaurant = 500,
                 };
 
 
@@ -420,8 +420,6 @@ namespace FoodiFavs.Controllers
             _db.SaveChanges();
             return NoContent();
         }
-
-
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
