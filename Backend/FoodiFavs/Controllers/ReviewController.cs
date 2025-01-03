@@ -199,23 +199,24 @@ namespace FoodiFavs.Controllers
                 notification.ReviewId=model.Id;
                 notification.RestaurantId=model.RestaurantId;
                 //To find top review for each user
-                var existingTopReview = _db.TopReviewForUsers.FirstOrDefault(tr => tr.UserId == user.Id);
-
-                if (existingTopReview!=null)
+                
+            }
+            var existingTopReview = _db.TopReviewForUsers.FirstOrDefault(tr => tr.UserId == user.Id);
+            if (existingTopReview!=null)
+            {
+                if (model.Rating>user.TopRateReview)
                 {
-                    if (model.Rating>user.TopRateReview)
-                    {
-                        existingTopReview.ReviewId = model.Id;
-                        existingTopReview.RestaurantId = restaurant.Id;
-                        existingTopReview.TopRate = model.Rating;
+                    existingTopReview.ReviewId = model.Id;
+                    existingTopReview.RestaurantId = restaurant.Id;
+                    existingTopReview.TopRate = model.Rating;
 
-                        user.TopRateReview = model.Rating;
-                        await _db.SaveChangesAsync();
+                    user.TopRateReview = model.Rating;
+                    await _db.SaveChangesAsync();
 
-                    }
                 }
-                else
-                {
+            }
+            else
+            {
                     TopReview.UserId=user.Id;
                     TopReview.ReviewId=model.Id;
                     user.TopRateReview=model.Rating;
@@ -223,8 +224,8 @@ namespace FoodiFavs.Controllers
                     TopReview.RestaurantId=restaurant.Id;
                     _db.TopReviewForUsers.Add(TopReview);
 
-                }
             }
+            
             userRestaurantPoints.AllPoints=user.TotalPoints;
             user.UnReadNotiNum = user.UnReadNotiNum ?? 0;
             user.UnReadNotiNum++;
