@@ -180,7 +180,7 @@ namespace FoodiFavs.Controllers
                 {
                     UserId = user.Id,
                     RestaurantId = obj.RestaurantId,
-                    PointsForEachRestaurant = 500,
+                    PointsForEachRestaurant = 5,
                 };
 
 
