@@ -202,6 +202,7 @@ namespace FoodiFavs.Controllers
                 var existingTopReview = _db.TopReviewForUsers.FirstOrDefault(tr => tr.UserId == user.Id);
 
                 if (existingTopReview!=null)
+                {
                     if (model.Rating>user.TopRateReview)
                     {
                         existingTopReview.ReviewId = model.Id;
@@ -212,16 +213,17 @@ namespace FoodiFavs.Controllers
                         await _db.SaveChangesAsync();
 
                     }
-                    else 
-                    {
-                        TopReview.UserId=user.Id;
-                        TopReview.ReviewId=model.Id;
-                        user.TopRateReview=model.Rating;
-                        TopReview.TopRate=model.Rating;
-                        TopReview.RestaurantId=restaurant.Id;
-                        _db.TopReviewForUsers.Add(TopReview);
+                }
+                else
+                {
+                    TopReview.UserId=user.Id;
+                    TopReview.ReviewId=model.Id;
+                    user.TopRateReview=model.Rating;
+                    TopReview.TopRate=model.Rating;
+                    TopReview.RestaurantId=restaurant.Id;
+                    _db.TopReviewForUsers.Add(TopReview);
 
-                    }
+                }
             }
             userRestaurantPoints.AllPoints=user.TotalPoints;
             user.UnReadNotiNum = user.UnReadNotiNum ?? 0;
@@ -272,27 +274,26 @@ namespace FoodiFavs.Controllers
         //[Authorize(Roles ="Admin")]
         public async Task<IActionResult> DeleteReview(int Id)
         {
-
-            if (Id==0)
+            if (Id == 0)
             {
-                return BadRequest();
-            }
-            var Review = _db.Reviews.FirstOrDefault(r => r.Id==Id);
-            if (Review == null)
-            {
-                return NotFound();
+                return BadRequest("Review ID cannot be zero.");
             }
 
-            var userId = Review.UserId;
-            var user = _db.Users.FirstOrDefault(u => u.Id==userId);
-            var points = _db.Points.FirstOrDefault(p => p.UserId==userId);
-            var restaurants = _db.Restaurants.FirstOrDefault(r => r.Id==Review.RestaurantId);
-            var notifications = _db.Notifications.Where(n => n.ReviewId == Review.Id).ToList();
-            var order = _db.Orders.FirstOrDefault(o => o.ReviewId==Review.Id);
-            var likes = _db.Likes.Where(l => l.ReviewId == Review.Id).ToList();
+            var review = _db.Reviews.FirstOrDefault(r => r.Id == Id);
+            if (review == null)
+            {
+                return NotFound("Review not found.");
+            }
 
+            var userId = review.UserId;
+            var user = _db.Users.FirstOrDefault(u => u.Id == userId);
+            var points = _db.Points.FirstOrDefault(p => p.UserId == userId);
+            var restaurant = _db.Restaurants.FirstOrDefault(r => r.Id == review.RestaurantId);
+            var notifications = _db.Notifications.Where(n => n.ReviewId == review.Id).ToList();
+            var order = _db.Orders.FirstOrDefault(o => o.ReviewId == review.Id);
+            var likes = _db.Likes.Where(l => l.ReviewId == review.Id).ToList();
 
-            if (order!=null)
+            if (order != null)
             {
                 _db.Orders.Remove(order);
             }
@@ -304,92 +305,122 @@ namespace FoodiFavs.Controllers
             {
                 _db.Notifications.RemoveRange(notifications);
             }
+
             var topReviews = _db.TopReviewForUsers.Where(tr => tr.ReviewId == Id).ToList();
             if (topReviews.Any())
             {
-                _db.TopReviewForUsers.RemoveRange(topReviews); // Remove all related records
+                _db.TopReviewForUsers.RemoveRange(topReviews);
             }
-            _db.Reviews.Remove(Review);
 
+            _db.Reviews.Remove(review);
             _db.SaveChanges();
 
+            //update restaurant review count and rating
+            if (restaurant != null)
+            {
+                restaurant.ReviewCount = restaurant.ReviewCount > 0 ? restaurant.ReviewCount - 1 : 0;
 
-            if (restaurants!=null)
-            {
-                restaurants.ReviewCount--;
+                var allRatings = await _db.Reviews
+                    .Where(r => r.RestaurantId == restaurant.Id)
+                    .Select(r => r.Rating)
+                    .ToListAsync();
+
+                restaurant.Rating = allRatings.Any()
+                    ? Math.Floor(allRatings.Average() * 10) / 10
+                    : 0;
             }
-            if (points!=null)
+
+            //update user points and likes
+            if (points != null)
             {
-                if (points.PointsForEachRestaurant>0 || points.AllPoints > 0)
+                if (points.PointsForEachRestaurant > 0)
                 {
-                    points.PointsForEachRestaurant-=5;
-                    points.AllPoints-=5;
+                    points.PointsForEachRestaurant -= 5;
                 }
-                else 
+                else
                 {
-                    points.PointsForEachRestaurant=0;
-                    points.AllPoints=0;
+                    points.PointsForEachRestaurant = 0;
                 }
 
+                if (points.AllPoints > 0)
+                {
+                    points.AllPoints -= 5;
+                }
+                else
+                {
+                    points.AllPoints = 0;
+                }
             }
 
-
-
-            if (user.TotalLikes>0)
+            if (user != null)
             {
-                user.TotalLikes-=Review.Likes;
-            }
-            else
-            {
-                user.TotalLikes=0;
-            }
+                if (user.TotalLikes > 0)
+                {
+                    user.TotalLikes -= review.Likes;
+                }
+                else
+                {
+                    user.TotalLikes = 0;
+                }
 
-            if (user.TotalPoints > 0)
-            {
-                user.TotalPoints-=5;
-            }
-            else
-                user.TotalPoints=0;
-            
-            Review.UserNav.ReviewCount--;
-            var allRatings =  await _db.Reviews
-             .Where(r => r.RestaurantId == restaurants.Id)
-             .Select(r => r.Rating)
-             .ToListAsync();
+                if (user.TotalPoints > 0)
+                {
+                    user.TotalPoints -= 5;
+                }
+                else
+                {
+                    user.TotalPoints = 0;
+                }
 
-            restaurants.Rating = Math.Floor(allRatings.Average() * 10) / 10;
-            var TopRate = _db.TopReviewForUsers.FirstOrDefault(u => u.UserId==userId);
+                if (user.ReviewCount > 0)
+                {
+                    user.ReviewCount--;
+                }
+                else
+                {
+                    user.ReviewCount = 0;
+                }
 
-            if (TopRate != null)
-            {
+                //update top review for the user
                 var topRatedReview = _db.Reviews
-                        .Where(r => r.UserId == userId)
-                        .OrderByDescending(r => r.Rating)
-                        .FirstOrDefault();
+                    .Where(r => r.UserId == userId)
+                    .OrderByDescending(r => r.Rating)
+                    .FirstOrDefault();
+
+                var topRate = _db.TopReviewForUsers.FirstOrDefault(tr => tr.UserId == userId);
                 if (topRatedReview != null)
                 {
-                    user.TopRateReview=topRatedReview.Rating;
-                    TopRate.ReviewId=topRatedReview.Id;
-                    TopRate.TopRate=topRatedReview.Rating;
-                    TopRate.RestaurantId=topRatedReview.RestaurantId;
+                    user.TopRateReview = topRatedReview.Rating;
+
+                    if (topRate != null)
+                    {
+                        topRate.ReviewId = topRatedReview.Id;
+                        topRate.TopRate = topRatedReview.Rating;
+                        topRate.RestaurantId = topRatedReview.RestaurantId;
+                    }
+                    else
+                    {
+                        var newTopReview = new TopReviewForUser
+                        {
+                            UserId = user.Id,
+                            ReviewId = topRatedReview.Id,
+                            TopRate = topRatedReview.Rating,
+                            RestaurantId = topRatedReview.RestaurantId,
+                        };
+                        _db.TopReviewForUsers.Add(newTopReview);
+                    }
                 }
-            }
-            else 
-            {
-                var TopReview = new TopReviewForUser
+                else if (topRate != null)
                 {
-                    UserId=user.Id,
-                    ReviewId=Review.Id,
-                    TopRate=Review.Rating,
-                    RestaurantId=Review.Id,
-                };
-                user.TopRateReview=Review.Rating;
-                _db.TopReviewForUsers.Add(TopReview);
+                    _db.TopReviewForUsers.Remove(topRate);
+                }
             }
 
             _db.SaveChanges();
             return NoContent();
         }
+
+
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
