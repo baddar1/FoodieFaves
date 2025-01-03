@@ -483,7 +483,7 @@ namespace FoodiFavs.Controllers
                 {
                     var notification = new Notification
                     {
-                        UserId = Review.UserId, // Notify the Blogger
+                        UserId = Review.UserId, //notify the Blogger
                         Message = $"{user.UserName} liked your review.",
                         CreatedAt = DateTime.UtcNow,
                         IsRead = false,
@@ -493,7 +493,7 @@ namespace FoodiFavs.Controllers
 
                     };
                     var Blogger = _db.Users.FirstOrDefault(u => u.Id==Review.UserId);
-                    if (Blogger != null) 
+                    if (Blogger == null) 
                     {
                         return BadRequest("No User with this review");
                     }
@@ -624,7 +624,5 @@ namespace FoodiFavs.Controllers
                 ReportedReviews = reportedReviews
             });
         }
-
-
     }
 }
