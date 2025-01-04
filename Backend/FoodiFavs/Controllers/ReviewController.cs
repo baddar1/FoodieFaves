@@ -553,27 +553,28 @@ namespace FoodiFavs.Controllers
                 return BadRequest("Invalid Restaurant ID");
             }
 
-            var sortedReviews = _db.Restaurants
-                 .Where(r => r.Id == restaurantId)
-                 .Select(r => new
-                 {
-                     Reviews = r.ReviweNav.Select(review => new
-                     {
-                         review.Id,
-                         review.Rating,
-                         review.Comment,
-                         review.CreatedAt,
-                         UserName = review.UserNav.UserName,
-                         UserId = review.UserNav.Id,
-                         UserImg = review.UserNav.ImgUrl,
-                         TotalLikes = review.Likes,
+            var sortedReviews = await _db.Restaurants
+                .Where(r => r.Id == restaurantId)
+                .Select(r => new
+                {
+                    Reviews = r.ReviweNav
+                        .OrderByDescending(review => review.Likes)
+                        .Select(review => new
+                        {
+                            review.Id,
+                            review.Rating,
+                            review.Comment,
+                            review.CreatedAt,
+                            UserName = review.UserNav.UserName,
+                            UserId = review.UserNav.Id,
+                            UserImg = review.UserNav.ImgUrl,
+                            TotalLikes = review.Likes
+                        })
+                        .ToList()
+                })
+                .FirstOrDefaultAsync();
 
-                     }).ToList()
-
-                 })
-                 .FirstOrDefault();
-
-            if (sortedReviews==null)
+            if (sortedReviews == null)
             {
                 return NotFound("No reviews found for the given restaurant.");
             }
