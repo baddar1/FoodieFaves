@@ -130,7 +130,14 @@ namespace FoodiFavs.Controllers
                 RestaurantPoints.PointsForEachRestaurant=0;
             }
             _db.SaveChanges();
-            return Ok($"{SetVoucher.voucherCode}");
+            return Ok(new
+            {
+                SetVoucher.voucherCode,
+                SetVoucher.voucherType,
+                SetVoucher.RestaurantId,
+                SetVoucher.RestaurantNav.Name,
+
+            });
 
         }
         [HttpPost("Use-Voucher")]
@@ -230,12 +237,6 @@ namespace FoodiFavs.Controllers
 
             });
         }
-
-
-
-
-
-
 
     }
 }
