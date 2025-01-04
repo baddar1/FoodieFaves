@@ -546,40 +546,47 @@ namespace FoodiFavs.Controllers
             return Ok("Review reported successfully.");
         }
         [HttpPost("Sort-By-Likes")]
-        public async Task<IActionResult> SorteReviewsdByLikes(int restaurantId)
+        public async Task<IActionResult> SortedReviewsByLikes(int restaurantId)
         {
-            if (restaurantId == 0)
+            if (restaurantId <= 0)
             {
                 return BadRequest("Invalid Restaurant ID");
             }
 
-            // Get all reviews for the restaurant
-            var reviews = await _db.Reviews
+            var sortedReviews = await _db.Reviews
                 .Where(r => r.RestaurantId == restaurantId)
-                .ToListAsync();
-
-            if (reviews == null || !reviews.Any())
-            {
-                return NotFound("No reviews found for the given restaurant.");
-            }
-
-
-            var sortedReviews = reviews
                 .OrderByDescending(r => r.Likes)
                 .Select(r => new
                 {
                     r.Id,
                     r.Comment,
                     r.Rating,
-                    r.UserId,
-                    r.RestaurantId,
+                    r.CreatedAt,
                     r.Likes,
-                    r.CreatedAt
+                    Reviewer = new
+                    {
+                        r.UserNav.Id,
+                        r.UserNav.UserName,
+                        r.UserNav.ImgUrl
+                    },
+                    Restaurant = new
+                    {
+                        r.RestaurantNav.Id,
+                        r.RestaurantNav.Name,
+                        r.RestaurantNav.Cuisine,
+                        r.RestaurantNav.Location
+                    }
                 })
-                .ToList();
+                .ToListAsync();
+
+            if (!sortedReviews.Any())
+            {
+                return NotFound("No reviews found for the given restaurant.");
+            }
 
             return Ok(sortedReviews);
         }
+
         [HttpGet("review-count")]
         public ActionResult<int> GetReviewesNumber()
         {
