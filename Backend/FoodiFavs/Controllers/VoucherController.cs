@@ -113,9 +113,22 @@ namespace FoodiFavs.Controllers
             _db.Notifications.Add(notification);
             _db.Vouchers.Add(SetVoucher);
             _db.SaveChanges();
+            
             user.TotalPoints-=points;
+            if (user.TotalPoints<0) 
+            {
+                user.TotalPoints=0;
+            }
             RestaurantPoints.AllPoints-=points;
+            if (RestaurantPoints.AllPoints<0) 
+            {
+                RestaurantPoints.AllPoints=0;
+            }
             RestaurantPoints.PointsForEachRestaurant-=points;
+            if (RestaurantPoints.PointsForEachRestaurant<0) 
+            {
+                RestaurantPoints.PointsForEachRestaurant=0;
+            }
             _db.SaveChanges();
             return Ok($"{SetVoucher.voucherCode}");
 
