@@ -180,7 +180,7 @@ namespace FoodiFavs.Controllers
                 {
                     UserId = user.Id,
                     RestaurantId = obj.RestaurantId,
-                    PointsForEachRestaurant = 500,
+                    PointsForEachRestaurant = 5,
                 };
 
 
@@ -553,33 +553,27 @@ namespace FoodiFavs.Controllers
                 return BadRequest("Invalid Restaurant ID");
             }
 
-            var sortedReviews = await _db.Reviews
-                .Where(r => r.RestaurantId == restaurantId)
-                .OrderByDescending(r => r.Likes)
-                .Select(r => new
-                {
-                    r.Id,
-                    r.Comment,
-                    r.Rating,
-                    r.CreatedAt,
-                    r.Likes,
-                    Reviewer = new
-                    {
-                        r.UserNav.Id,
-                        r.UserNav.UserName,
-                        r.UserNav.ImgUrl
-                    },
-                    Restaurant = new
-                    {
-                        r.RestaurantNav.Id,
-                        r.RestaurantNav.Name,
-                        r.RestaurantNav.Cuisine,
-                        r.RestaurantNav.Location
-                    }
-                })
-                .ToListAsync();
+            var sortedReviews = _db.Restaurants
+                 .Where(r => r.Id == restaurantId)
+                 .Select(r => new
+                 {
+                     Reviews = r.ReviweNav.Select(review => new
+                     {
+                         review.Id,
+                         review.Rating,
+                         review.Comment,
+                         review.CreatedAt,
+                         UserName = review.UserNav.UserName,
+                         UserId = review.UserNav.Id,
+                         UserImg = review.UserNav.ImgUrl,
+                         TotalLikes = review.Likes,
 
-            if (!sortedReviews.Any())
+                     }).ToList()
+
+                 })
+                 .FirstOrDefault();
+
+            if (sortedReviews==null)
             {
                 return NotFound("No reviews found for the given restaurant.");
             }
