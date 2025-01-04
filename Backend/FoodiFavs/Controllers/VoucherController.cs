@@ -25,7 +25,7 @@ namespace FoodiFavs.Controllers
         }
 
         [HttpPost("BuyVoucher")]
-        public IActionResult BuyVoucher(int points, int restaurantId)
+        public IActionResult BuyVoucher([FromQuery] int points, [FromQuery] int restaurantId)
         {
             var userName = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = _db.Users.FirstOrDefault(u => u.UserName == userName);
@@ -36,7 +36,7 @@ namespace FoodiFavs.Controllers
             var restaurant = _db.Restaurants.FirstOrDefault(r => r.Id==restaurantId);
             if (restaurant == null) 
             {
-                return BadRequest($"{restaurant.Name} is out of service");
+                return BadRequest($"is out of service");
             }
             var RestaurantPoints = _db.Points.FirstOrDefault(p => p.UserId==user.Id && p.RestaurantId==restaurantId);
             if (RestaurantPoints==null)
